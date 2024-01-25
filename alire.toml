@@ -1,0 +1,7 @@
+name = "stm32l0xx_hal"
+description = "Shiny new project"
+version = "0.0.0-dev"
+
+authors = ["Emanuele Zarfati"]
+maintainers = ["Emanuele Zarfati <zarfati.tecno@gmail.com>"]
+maintainers-logins = ["ezetec"]
