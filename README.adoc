@@ -47,3 +47,25 @@ branching model. Although strict naming conventions are not enforced,
 `feature` branches should branch from `develop` and `fix` branches from `main`
 or latest `release`.
 
+Documentation:: The Specification (`.ads`) files are annotated to ease the
+extract the documentation through AdaCore's
+link:https://docs.adacore.com/live/wave/gnatdoc4/html/gnatdoc-doc/index.html[GNATdoc].
+The tool is available as link:https://alire.ada.dev/crates/gnatdoc[Alire
+crate]. Retrieve and compile GNATdoc it with:
++
+.Retrieve GNATdoc
+[source, console]
+----
+$ alr get --build gnatdoc
+----
++
+Append the resulting `gnatdoc_<...>/bin/` directory to `$PATH` and create the
+following Alire alias:
++
+.Create the alire alias for gnatdoc
+[source, console]
+----
+$ alr config --set alias.doc "exec -P gnatdoc"
+----
++
+Finally, generate the HTML documentation executing `alr doc`.
