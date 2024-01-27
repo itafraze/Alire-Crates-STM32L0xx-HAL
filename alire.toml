@@ -1,6 +1,6 @@
 name = "stm32l0xx_hal"
 description = "HAL library for STMicroelectronics' STM32L0 MCU series"
-version = "0.0.0-dev"
+version = "0.0.1-dev"
 
 authors = ["Emanuele Zarfati"]
 maintainers = ["Emanuele Zarfati <zarfati.tecno@gmail.com>"]
@@ -8,10 +8,10 @@ maintainers-logins = ["ezetec"]
 
 [[depends-on]]
 gnat_arm_elf = "^13.2.1"
-stm32l0xx_cmsis = "*"
+stm32l0xx_cmsis = "0.1.0-dev"
 
 [[pins]]
-stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', branch='feature/Add-support-for-stm32l011d4' }
+stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git'}
 
 [build-switches]
 "*".Ada_Version = "Ada2022"
