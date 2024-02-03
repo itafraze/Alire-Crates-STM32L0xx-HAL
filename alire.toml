@@ -15,3 +15,9 @@ stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.
 
 [build-switches]
 "*".Ada_Version = "Ada2022"
+
+[configuration.variables]
+Buffer_Cache_Disable = {type = "Boolean", default = false}
+Preread_Enable = {type = "Boolean", default = false}
+Prefetch_Enable = {type = "Boolean", default = false}
+Tick_Init_Priority = {type = "Integer", first = 0, last = 3, default = 3}
