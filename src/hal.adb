@@ -23,11 +23,16 @@
 
 with System;
 with Stm32l0xx_Hal_Config;
+with CMSIS.Device.System;
+with HAL.Cortex;
 
 package body HAL is
    --  Implementation Notes:
    --  - Based on source files
    --    - stm32l0xx_hal_driver:Src/stm32l0xx_hal.c
+
+   Tick_Frequency : constant Tick_Frequency_Type := TICK_FREQ_1_KHZ;
+   --
 
    ---------------------------------------------------------------------------
    function Init
@@ -59,12 +64,26 @@ package body HAL is
    end Init;
 
    ---------------------------------------------------------------------------
-   function Init_Tick (Tick_Priority : Natural)
+   function Init_Tick (Tick_Priority : Tick_Priority_Type)
       return Status_Type
    is
-      pragma Unreferenced (Tick_Priority);
+      use CMSIS.Device.System;
+      use CMSIS.Core.Types;
+
+      Status : constant Status_Type := OK;
+
+      --  From the Core clock frequency compute the number of ticks per
+      --  milliseconds
+      Ticks_Per_Millisecond : constant HAL.Cortex.Ticks_Type :=
+         HAL.Cortex.Ticks_Type (Core_Clock
+            / (Natural'(1000) / Natural (Tick_Frequency'Enum_Rep)));
    begin
-      return ERROR;
+
+      HAL.Cortex.SYSTICK_Config (Ticks_Per_Millisecond);
+      HAL.Cortex.NVIC_Set_Priority (IRQ_SYSTEM_TICK, Tick_Priority, 0);
+
+      return Status;
+
    end Init_Tick;
 
 end HAL;

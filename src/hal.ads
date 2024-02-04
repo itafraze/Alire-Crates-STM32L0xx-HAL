@@ -21,9 +21,11 @@
 --
 ------------------------------------------------------------------------------
 
+with CMSIS.Core.Types;
+
 package HAL is
    --  Hardware Abstraction Layer (HAL)
-
+   --
    --  The portable APIs layer provides a generic, multi instanced and simple
    --  set of APIs to interact with the upper layer (application, libraries
    --  and stacks).
@@ -32,14 +34,21 @@ package HAL is
    --  - Based on source files
    --    - stm32l0xx_hal_driver:Inc/stm32l0xx_hal.h
 
-   pragma Preelaborate;
-
    type Status_Type is (OK, ERROR, BUSY, TIMEOUT);
    --  Type of HAL Status
    --
    --  The HAL status is used by almost all HAL APIs, except for boolean
    --  functions and IRQ handler. It returns the status of the current API
    --  operations.
+
+   type Tick_Frequency_Type is (
+      TICK_FREQ_1_KHZ, TICK_FREQ_100_HZ, TICK_FREQ_10_HZ);
+   --  Pre-defined SysTick interrupt frequencies
+   for Tick_Frequency_Type use (1, 10, 100);
+   --  Represent Tick_Frequency_Type as number of millisecods
+
+   subtype Tick_Priority_Type is CMSIS.Core.Types.Priority_Type;
+   --
 
    ---------------------------------------------------------------------------
    function Init
@@ -60,7 +69,7 @@ package HAL is
    --  @return Status of operations
 
    ---------------------------------------------------------------------------
-   function Init_Tick (Tick_Priority : Natural)
+   function Init_Tick (Tick_Priority : Tick_Priority_Type)
       return Status_Type;
    --  Initialise SysTick regular time intervals interrupt
    --
