@@ -11,7 +11,7 @@ gnat_arm_elf = "^13.2.1"
 stm32l0xx_cmsis = "0.1.0-dev"
 
 [[pins]]
-stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="a047f37d2c8d78e1be5ff65f864d603cb5d34d3c"}
+stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="a13abed132283682e037f854180b20844eaaee76"}
 
 [build-switches]
 "*".Ada_Version = "Ada2022"
