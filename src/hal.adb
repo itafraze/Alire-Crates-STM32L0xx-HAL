@@ -47,8 +47,8 @@ package body HAL is
       --  TODO Support BUFFER_CACHE_DISABLE, PREREAD_ENABLE and
       --  PREFETCH_ENABLE
       if not Buffer_Cache_Disable
-         or not Preread_Enable
-         or not Prefetch_Enable
+         and not Preread_Enable
+         and not Prefetch_Enable
       then
          Status := Init_Tick (Tick_Init_Priority);
       end if;
