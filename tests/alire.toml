@@ -1,6 +1,6 @@
 name = "tests"
-description = "Shiny new project"
-version = "0.1.0-dev"
+description = "Tests project for library stm32l0xx_hal"
+version = "0.0.0-dev"
 
 authors = ["Emanuele Zarfati"]
 maintainers = ["Emanuele Zarfati <zarfati.tecno@gmail.com>"]
@@ -10,9 +10,30 @@ executables = ["tests"]
 
 [[depends-on]]
 gnat_arm_elf = "^13.2.1"
-
-[[depends-on]]
 stm32l0xx_hal = "*"
 
 [[pins]]
 stm32l0xx_hal = { path='..' }
+
+[build-profiles]
+"*" = "development"
+
+[[actions]]
+type = "post-build"
+command = ["sh", "-c", "arm-eabi-objdump -DxS bin/tests.elf | tee bin/tests.dis >/dev/null"]
+
+[[actions]]
+type = "post-build"
+command = ["sh", "-c", "arm-eabi-objcopy -O binary -R .eeprom bin/tests.elf bin/tests-noeeprom.bin"]
+
+[[actions]]
+type = "post-build"
+command = ["sh", "-c", "arm-eabi-objcopy -O binary -j .eeprom bin/tests.elf bin/tests-eeprom.bin"]
+
+[[actions]]
+type = "post-build"
+command = ["sh", "-c", "hexdump -C bin/tests-noeeprom.bin | tee bin/tests-noeeprom.hexdump >/dev/null"]
+
+[[actions]]
+type = "post-build"
+command = ["sh", "-c", "hexdump -C bin/tests-eeprom.bin | tee bin/tests-eeprom.hexdump >/dev/null"]
