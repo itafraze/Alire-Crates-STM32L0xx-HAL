@@ -36,11 +36,6 @@ package body HAL is
       use System;
       use Stm32l0xx_Hal_Config;
 
-      procedure MSP_Init_Callback
-         with Import => True;
-      --  When the callback is needed, the MSP_Init_Callback could be
-      --  implemented by the user
-
       Status : Status_Type := ERROR;
    begin
 
@@ -54,9 +49,9 @@ package body HAL is
       end if;
 
       if (OK = Status)
-         and then (MSP_Init_Callback'Address /= Null_Address)
+         and then (MSP_Init'Address /= Null_Address)
       then
-         MSP_Init_Callback;
+         MSP_Init;
       end if;
 
       return Status;

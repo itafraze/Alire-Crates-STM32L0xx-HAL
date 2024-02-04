@@ -50,7 +50,7 @@ package HAL is
    --  - initialises the data/instruction cache and the pre-fetch queue
    --  - sets SysTick timer to generate an interrupt each 1ms (based on HSI
    --    clock) with the lowest priority
-   --  - calls HAL_MspInit() user callback function to perform system level
+   --  - calls MSP_Init() user callback function to perform system level
    --    initializations (Clock, GPIOs, DMA, interrupts)
    --
    --  Notes:
@@ -74,5 +74,14 @@ package HAL is
    --
    --  @param Tick_Priority Tick interrupt priority.
    --  @return Status of operations
+
+private
+
+   ---------------------------------------------------------------------------
+   procedure MSP_Init
+      with Import;
+   pragma Weak_External (MSP_Init);
+   --  When the callback is needed, the MSP_Init could be implemented by the
+   --  user
 
 end HAL;

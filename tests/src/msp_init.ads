@@ -21,26 +21,7 @@
 --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-with CMSIS.Device.System;
-with HAL;
-with MSP_Init;
-
-pragma Unreferenced (MSP_Init);
-
-procedure Tests
-is
-   use Ada.Text_IO;
-   use all type HAL.Status_Type;
-begin
-
-   CMSIS.Device.System.Init;
-
-   if OK /= HAL.Init then
-      Put_Line ("HAL initialisation failed");
-   end if;
-
-   --  Send welcome message
-   Put_Line ("Tests passed");
-
-end Tests;
+procedure MSP_Init
+   with Export;
+   --  Example implementation of procedure MSP_Init, which is executed by
+   --  HAL.Init
