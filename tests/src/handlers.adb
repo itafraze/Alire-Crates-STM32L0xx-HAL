@@ -22,34 +22,27 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO;
-with CMSIS.Device.System;
-with HAL;
 
-with MSP_Init;
-pragma Unreferenced (MSP_Init);
-with Handlers;
-pragma Unreferenced (Handlers);
+package body Handlers is
 
-procedure Tests
-is
-   use Ada.Text_IO;
-   use all type HAL.Status_Type;
-begin
+   type Count_1000_Type is mod 1000;
 
-   --  Works with semihosting
-   Put_Line ("Welcome to STM32L0xx HAL library's tests");
+   Count_1000 : Count_1000_Type := 0;
+   Count : Natural := 0;
 
-   CMSIS.Device.System.Init;
+   ---------------------------------------------------------------------------
+   procedure SysTick_Handler
+   is
+      use Ada.Text_IO;
+   begin
 
-   if OK /= HAL.Init then
-      Put_Line ("HAL initialisation failed");
-   end if;
+      if Count_1000 = 0 then
+         --  Works with semihosting
+         Put_Line ("SysTick_Handler trigger n." & Count'Image);
+         Count := @ + 1;
+      end if;
+      Count_1000 := @ + 1;
 
-   --  Send welcome message
-   Put_Line ("Tests passed");
+   end SysTick_Handler;
 
-   loop
-      null;
-   end loop;
-
-end Tests;
+end Handlers;

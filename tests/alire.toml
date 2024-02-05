@@ -18,6 +18,9 @@ stm32l0xx_hal = { path='..' }
 [build-profiles]
 "*" = "development"
 
+[build-switches]
+"*".Ada_Version = "Ada2022"
+
 [[actions]]
 type = "post-build"
 command = ["sh", "-c", "arm-eabi-objdump -DxS bin/tests.elf | tee bin/tests.dis >/dev/null"]
