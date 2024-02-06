@@ -39,15 +39,6 @@ package body HAL.RCC is
    package HAL_Config renames Stm32l0xx_Hal_Config;
    --
 
-   type System_Clock_Source_Type is (MSI, HSI, HSE, PLLCLK);
-   --
-   for System_Clock_Source_Type use (
-      MSI => 2#00#,
-      HSI => 2#01#,
-      HSE => 2#10#,
-      PLLCLK => 2#11#);
-   --
-
    ---------------------------------------------------------------------------
    function Get_System_Clock_Source
       return System_Clock_Source_Type
@@ -172,7 +163,6 @@ package body HAL.RCC is
    --  - Based on MSI code section from function HAL_RCC_OscConfig
    --
    --  TODO:
-   --  - Correctly take into account AHB prescaler in System.Core_Clock update
    --  - Add timeout in MSI ready wait
 
       Success : Status_Type := OK;
@@ -182,30 +172,27 @@ package body HAL.RCC is
       if Get_System_Clock_Source = MSI
       then
 
-         if (Boolean'Val (RCC.RCC_Periph.CR.MSIRDY) /= False)
-            and then (State = OFF)
-         then
+         return ERROR
+            when (Boolean'Val (RCC.RCC_Periph.CR.MSIRDY) /= False)
+               and then (State = OFF);
 
-            Success := ERROR;
+         RCC.RCC_Periph.ICSCR := (@ with delta
+            MSIRANGE => RCC.ICSCR_MSIRANGE_Field (Clock_Range),
+            MSITRIM  => RCC.ICSCR_MSITRIM_Field (Calibration));
 
-         else
+         --  Update current System.Core_Clock variable
+         CMSIS.Device.System.Core_Clock := Natural (Shift_Right (
+            UInt32 (Get_System_Clock_Frequency),
+            Natural (
+               case RCC.RCC_Periph.CFGR.HPRE
+               is
+               when 16#0# .. 16#7# => 0,
+               when 16#8# .. 16#B# => RCC.RCC_Periph.CFGR.HPRE - 16#7#,
+               when 16#C# .. 16#F# => RCC.RCC_Periph.CFGR.HPRE - 16#6#)));
 
-            RCC.RCC_Periph.ICSCR :=
-               (RCC.RCC_Periph.ICSCR with delta
-                  MSIRANGE => RCC.ICSCR_MSIRANGE_Field (Clock_Range),
-                  MSITRIM  => RCC.ICSCR_MSITRIM_Field (Calibration));
-
-            --  Update current System_Core_Clock variable
-            --  TODO: Assumes AHB prescaler is not active (i.e. SYSCLK not
-            --  divided)
-            CMSIS.Device.System.Core_Clock := Natural (
-               Shift_Left (UInt32 (32_768), Natural (Clock_Range + 1)));
-
-            --  Configure the source of time base considering new system
-            --  clocks settings
-            Success := HAL.Init_Tick (HAL_Config.Tick_Init_Priority);
-
-         end if;
+         --  Configure the source of time base considering new system
+         --  clocks settings
+         Success := HAL.Init_Tick (HAL_Config.Tick_Init_Priority);
 
       --  Enable the Multi-Speed Internal (MSI) oscillator
       elsif State /= OFF
@@ -219,10 +206,9 @@ package body HAL.RCC is
             --  TODO add timeout
          end loop;
 
-         RCC.RCC_Periph.ICSCR :=
-            (RCC.RCC_Periph.ICSCR with delta
-               MSIRANGE => RCC.ICSCR_MSIRANGE_Field (Clock_Range),
-               MSITRIM  => RCC.ICSCR_MSITRIM_Field (Calibration));
+         RCC.RCC_Periph.ICSCR := (@ with delta
+            MSIRANGE => RCC.ICSCR_MSIRANGE_Field (Clock_Range),
+            MSITRIM  => RCC.ICSCR_MSITRIM_Field (Calibration));
 
       --  Disable the Multi-Speed Internal (MSI) oscillator
       else
@@ -274,6 +260,7 @@ package body HAL.RCC is
             State       => Init.MSI_State,
             Calibration => Init.MSI_Calibration_Value,
             Clock_Range => Init.MSI_Clock_Range);
+
          return Success when Success /= OK;
 
       end if;

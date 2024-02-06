@@ -40,6 +40,14 @@ package HAL.RCC is
    --  - Based on source files:
    --    - stm32l0xx_hal_driver:Inc/stm32l0xx_hal_rcc.h
 
+   type System_Clock_Source_Type is (MSI, HSI, HSE, PLLCLK);
+   --  Type of the clock source used as system clock
+   --
+   --  @enum MSI MSI selected as system clock
+   --  @enum HSI HSI selected as system clock
+   --  @enum HSE HSE selected as system clock
+   --  @enum PLLCLK PLL selected as system clock
+
    type Oscillator_Type is (HSE, HSI, LSE, LSI, MSI);
    --  Reset and Clock Control (RCC) oscillator type
    --
@@ -215,6 +223,13 @@ package HAL.RCC is
    --  @return SYSCLK frequency
 
 private
+
+   for System_Clock_Source_Type use (
+      MSI => 2#00#,
+      HSI => 2#01#,
+      HSE => 2#10#,
+      PLLCLK => 2#11#);
+   --  System clock switch status
 
    for PLL_Clock_Source_Type use (
       HSI => 2#0#,
