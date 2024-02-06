@@ -14,7 +14,7 @@ stm32l0xx_cmsis = "0.1.0-dev"
 stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="a13abed132283682e037f854180b20844eaaee76"}
 
 [build-switches]
-"*".Ada_Version = "Ada2022"
+"*".ada_version = ["-gnatX0"]
 
 [configuration.variables]
 Buffer_Cache_Disable = {type = "Boolean", default = false}

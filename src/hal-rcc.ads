@@ -104,7 +104,7 @@ package HAL.RCC is
    --  type
 
    type MSI_Clock_Range_Type is range 0 .. 6
-      with Default_Value => 0;
+      with Default_Value => 5;
    --  Multi-Speed Internal (MSI) oscillator clock range type
 
    type PLL_Config_Type is (NONE, OFF, ON)
