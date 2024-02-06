@@ -166,4 +166,35 @@ package body HAL.RCC is
 
    end Oscillators_Config;
 
+   ---------------------------------------------------------------------------
+   function Get_System_Clock_Frequency
+      return Natural
+   is
+   --  TODO:
+   --  - Implement HSE and PLLCLK
+
+      Frequency : Natural := 0;
+   begin
+
+      case Get_System_Clock_Source
+      is
+      when MSI => Frequency := Natural (
+         Shift_Left (UInt32 (32_768),
+                     Natural (RCC.RCC_Periph.ICSCR.MSIRANGE) + 1));
+
+      when HSI => Frequency := 16_000_000 / (
+         if Boolean'Val (RCC.RCC_Periph.CR.HSI16DIVF) = True
+         then 4
+         else 1);
+
+      when HSE | PLLCLK =>
+         --  TODO: To be implemented
+         null;
+
+      end case;
+
+      return Frequency;
+
+   end Get_System_Clock_Frequency;
+
 end HAL.RCC;

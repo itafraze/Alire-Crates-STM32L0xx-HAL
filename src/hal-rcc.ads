@@ -203,4 +203,15 @@ package HAL.RCC is
    --  @param Init Configuration information for the RCC oscillators
    --  @return Status of operations.
 
+   ---------------------------------------------------------------------------
+   function Get_System_Clock_Frequency
+      return Natural;
+   --  Returns the SYSCLK frequency
+   --
+   --  The system frequency computed by this function is not the real
+   --  frequency in the chip. It is calculated based on the predefined
+   --  constant and the selected clock source.
+   --
+   --  @return SYSCLK frequency
+
 end HAL.RCC;
