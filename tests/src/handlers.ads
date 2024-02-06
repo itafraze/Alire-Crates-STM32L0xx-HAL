@@ -21,35 +21,10 @@
 --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-with CMSIS.Device.System;
-with HAL;
+package Handlers is
 
-with MSP_Init;
-pragma Unreferenced (MSP_Init);
-with Handlers;
-pragma Unreferenced (Handlers);
+   ---------------------------------------------------------------------------
+   procedure SysTick_Handler
+      with Export, Convention => C, External_Name => "SysTick_Handler";
 
-procedure Tests
-is
-   use Ada.Text_IO;
-   use all type HAL.Status_Type;
-begin
-
-   --  Works with semihosting
-   Put_Line ("Welcome to STM32L0xx HAL library's tests");
-
-   CMSIS.Device.System.Init;
-
-   if OK /= HAL.Init then
-      Put_Line ("HAL initialisation failed");
-   end if;
-
-   --  Send welcome message
-   Put_Line ("Tests passed");
-
-   loop
-      null;
-   end loop;
-
-end Tests;
+end Handlers;
