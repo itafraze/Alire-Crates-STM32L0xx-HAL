@@ -214,4 +214,11 @@ package HAL.RCC is
    --
    --  @return SYSCLK frequency
 
+private
+
+   for PLL_Clock_Source_Type use (
+      HSI => 2#0#,
+      HSE => 2#1#);
+   --  PLL entry clock source
+
 end HAL.RCC;
