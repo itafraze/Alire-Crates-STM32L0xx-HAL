@@ -32,7 +32,12 @@ package body HAL is
    --    - stm32l0xx_hal_driver:Src/stm32l0xx_hal.c
 
    Tick_Frequency : constant Tick_Frequency_Type := TICK_FREQ_1_KHZ;
+   --  Frequency of the SysTick interrupt
    --
+   --  Implementation notes:
+   --  - This information is actually unmodified in current implementation of
+   --    the package, which does not provide the Tick-related APIs, hence it
+   --    is set constant.
 
    ---------------------------------------------------------------------------
    function Init

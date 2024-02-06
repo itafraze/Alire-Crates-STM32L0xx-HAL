@@ -30,8 +30,14 @@ package HAL is
    --  set of APIs to interact with the upper layer (application, libraries
    --  and stacks).
    --
-   --  Implementation Notes:
-   --  - Based on source files
+   --  This package provides initialisation functions to
+   --  - Initialize the Flash interface, the NVIC allocation and initial clock
+   --    configuration.
+   --  - Configure the time base source to have 1ms time base with a dedicated
+   --    Tick interrupt priority.
+   --
+   --  Implementation notes:
+   --  - Based on source files:
    --    - stm32l0xx_hal_driver:Inc/stm32l0xx_hal.h
 
    type Status_Type is (OK, ERROR, BUSY, TIMEOUT);
@@ -44,11 +50,18 @@ package HAL is
    type Tick_Frequency_Type is (
       TICK_FREQ_1_KHZ, TICK_FREQ_100_HZ, TICK_FREQ_10_HZ);
    --  Pre-defined SysTick interrupt frequencies
+   --  @enum TICK_FREQ_1_KHZ  Trigger SysTick interrupts every 1ms (default)
+   --  @enum TICK_FREQ_100_HZ Trigger SysTick interrupts every 10ms
+   --  @enum TICK_FREQ_10_HZ  Trigger SysTick interrupts every 100ms
    for Tick_Frequency_Type use (1, 10, 100);
-   --  Represent Tick_Frequency_Type as number of millisecods
+   --  Represent Tick_Frequency_Type as number of milliseconds
 
    subtype Tick_Priority_Type is CMSIS.Core.Types.Priority_Type;
+   --  Type of the SysTick interrupt priority
    --
+   --  Implementation notes:
+   --  -  Hardware-dependent implementation derived from CMSIS to enforce the
+   --     allowed values range.
 
    ---------------------------------------------------------------------------
    function Init
@@ -57,16 +70,16 @@ package HAL is
    --
    --  This function:
    --  - initialises the data/instruction cache and the pre-fetch queue
-   --  - sets SysTick timer to generate an interrupt each 1ms (based on HSI
-   --    clock) with the lowest priority
-   --  - calls MSP_Init() user callback function to perform system level
-   --    initializations (Clock, GPIOs, DMA, interrupts)
+   --  - calls Init_Tick to set SysTick timer to generate an interrupt each
+   --    1ms (based on HSI clock) with the lowest priority;
+   --  - calls MSP_Init user callback function to perform system level
+   --    initializations (Clock, GPIOs, DMA, interrupts).
    --
    --  Notes:
    --  - This function must be called at application startup after reset and
    --    before the clock configuration.
    --
-   --  @return Status of operations
+   --  @return Status of operations.
 
    ---------------------------------------------------------------------------
    function Init_Tick (Tick_Priority : Tick_Priority_Type)
@@ -79,10 +92,10 @@ package HAL is
    --
    --  Notes:
    --  - This function is called automatically at the beginning of program
-   --    after reset by HAL_Init().
+   --    after reset by HAL_Init.
    --
    --  @param Tick_Priority Tick interrupt priority.
-   --  @return Status of operations
+   --  @return Status of operations.
 
 private
 
@@ -90,7 +103,15 @@ private
    procedure MSP_Init
       with Import;
    pragma Weak_External (MSP_Init);
-   --  When the callback is needed, the MSP_Init could be implemented by the
-   --  user
+   --  When a global MSP initialization routine is needed, the MSP_Init could
+   --  be implemented by the user
+   --
+   --  Examples:
+   --  - Implement MSP_Init function with signature
+   --
+   --        procedure MSP_Init
+   --           with Export;
+   --
+   --    without package (msp_init.ad[sb]).
 
 end HAL;
