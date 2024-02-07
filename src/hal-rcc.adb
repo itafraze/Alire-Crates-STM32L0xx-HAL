@@ -270,6 +270,114 @@ package body HAL.RCC is
    end Oscillators_Config;
 
    ---------------------------------------------------------------------------
+   function Clocks_Config (Init          : Clocks_Init_Type;
+                           Flash_Latency : Latency_Type)
+      return Status_Type
+   is
+   --  TODO:
+   --  - Add timeout in ready waits
+   begin
+
+      --  Increasing the number of wait states because of higher CPU frequency
+      if Flash_Latency > HAL.Flash.Get_Latency
+      then
+         HAL.Flash.Set_Latency (Flash_Latency);
+
+         loop
+            exit when HAL.Flash.Get_Latency = Flash_Latency;
+            --  TODO add timeout
+         end loop;
+      end if;
+
+      --  HCLK Configuration  ----------------------------------------------
+      if Init.Clock (HCLK) = True
+      then
+
+         RCC.RCC_Periph.CFGR.HPRE :=
+            AHB_Clock_Divider_Type'Pos (Init.AHB_Clock_Divider)
+            + (case Init.AHB_Clock_Divider is
+               when DIV1 => 2#0000#,
+               when others => 2#0111#);
+
+      end if;
+
+      --  SYSCLK Configuration  --------------------------------------------
+      if Init.Clock (SYSCLK) = True
+      then
+
+         --  Check the selected clock is active
+         case Init.System_Clock_Source is
+         when MSI =>
+            return ERROR when not Boolean'Val (RCC.RCC_Periph.CR.MSIRDY);
+         when HSI =>
+            return ERROR when not Boolean'Val (RCC.RCC_Periph.CR.HSI16RDYF);
+         when HSE =>
+            return ERROR when not Boolean'Val (RCC.RCC_Periph.CR.HSERDY);
+         when PLLCLK =>
+            return ERROR when not Boolean'Val (RCC.RCC_Periph.CR.PLLRDY);
+         end case;
+
+         RCC.RCC_Periph.CFGR.SW :=
+            System_Clock_Source_Type'Enum_Rep (Init.System_Clock_Source);
+
+         loop
+            exit when Get_System_Clock_Source = Init.System_Clock_Source;
+            --  TODO add timeout
+         end loop;
+      end if;
+
+      --  Decreasing the number of wait states because of lower CPU frequency
+      if Flash_Latency < HAL.Flash.Get_Latency
+      then
+         HAL.Flash.Set_Latency (Flash_Latency);
+
+         loop
+            exit when HAL.Flash.Get_Latency = Flash_Latency;
+            --  TODO add timeout
+         end loop;
+      end if;
+
+      --  PCLK1 Configuration  ---------------------------------------------
+      if Init.Clock (HCLK) = True
+      then
+
+         RCC.RCC_Periph.CFGR.PPRE.Arr (1) :=
+            APB_Clock_Divider_Type'Pos (Init.APB1_Clock_Divider)
+            + (case Init.APB1_Clock_Divider is
+               when DIV1 => 2#000#,
+               when others => 2#011#);
+
+      end if;
+
+      --  PCLK2 Configuration  ---------------------------------------------
+      if Init.Clock (HCLK) = True
+      then
+
+         RCC.RCC_Periph.CFGR.PPRE.Arr (2) :=
+            APB_Clock_Divider_Type'Pos (Init.APB2_Clock_Divider)
+            + (case Init.APB2_Clock_Divider is
+               when DIV1 => 2#000#,
+               when others => 2#011#);
+
+      end if;
+
+      --  Update current System_Core_Clock global variable
+      CMSIS.Device.System.Core_Clock := Natural (Shift_Right (
+         UInt32 (Get_System_Clock_Frequency),
+         Natural (
+            case RCC.RCC_Periph.CFGR.HPRE
+            is
+            when 16#0# .. 16#7# => 0,
+            when 16#8# .. 16#B# => RCC.RCC_Periph.CFGR.HPRE - 16#7#,
+            when 16#C# .. 16#F# => RCC.RCC_Periph.CFGR.HPRE - 16#6#)));
+
+      --  Configure the source of time base considering new system clocks
+      --  settings
+      return HAL.Init_Tick (HAL_Config.Tick_Init_Priority);
+
+   end Clocks_Config;
+
+   ---------------------------------------------------------------------------
    function Get_System_Clock_Frequency
       return Natural
    is

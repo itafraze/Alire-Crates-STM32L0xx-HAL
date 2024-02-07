@@ -21,6 +21,9 @@
 --
 ------------------------------------------------------------------------------
 
+with HAL.Flash;
+   use all type HAL.Flash.Latency_Type;
+
 package HAL.RCC is
    --  HAL Reset and Clock Control (RCC) Generic Driver
    --
@@ -39,14 +42,6 @@ package HAL.RCC is
    --  Implementation notes:
    --  - Based on source files:
    --    - stm32l0xx_hal_driver:Inc/stm32l0xx_hal_rcc.h
-
-   type System_Clock_Source_Type is (MSI, HSI, HSE, PLLCLK);
-   --  Type of the clock source used as system clock
-   --
-   --  @enum MSI MSI selected as system clock
-   --  @enum HSI HSI selected as system clock
-   --  @enum HSE HSE selected as system clock
-   --  @enum PLLCLK PLL selected as system clock
 
    type Oscillator_Type is (HSE, HSI, LSE, LSI, MSI);
    --  Reset and Clock Control (RCC) oscillator type
@@ -195,6 +190,72 @@ package HAL.RCC is
    --  @field MSI_Clock_Range The MSI frequency range
    --  @field PLL_Init PLL structure parameters
 
+   type Clock_Type is (SYSCLK, HCLK, PCLK1, PCLK2);
+   --  System Clock Type
+   --
+   --  @enum SYSCLK System Clock
+   --  @enum HCLK Internal AHB clock
+   --  @enum PCLK1 Internal APB1 clock
+   --  @enum PCLK2 Internal APB2 clock
+
+   type Clock_Select_Type is array (Clock_Type) of Boolean
+      with Pack, Default_Component_Value => False;
+   --  Reset and Clock Control (RCC) clock selection type
+   --
+   --  Each element of the array flags the selection for configuration of the
+   --  corresponding RCC oscillator
+
+   type System_Clock_Source_Type is (MSI, HSI, HSE, PLLCLK);
+   --  Type of the clock source used as system clock
+   --
+   --  @enum MSI MSI selected as system clock
+   --  @enum HSI HSI selected as system clock
+   --  @enum HSE HSE selected as system clock
+   --  @enum PLLCLK PLL selected as system clock
+
+   type AHB_Clock_Divider_Type is (DIV1, DIV2, DIV4, DIV8, DIV16, DIV64,
+      DIV128, DIV256, DIV512);
+   --  AHB Clock Source type
+   --
+   --  @enum DIV1 SYSCLK not divided
+   --  @enum DIV2 SYSCLK divided by 2
+   --  @enum DIV4 SYSCLK divided by 4
+   --  @enum DIV8 SYSCLK divided by 8
+   --  @enum DIV16 SYSCLK divided by 16
+   --  @enum DIV64 SYSCLK divided by 64
+   --  @enum DIV128 SYSCLK divided by 128
+   --  @enum DIV256 SYSCLK divided by 256
+   --  @enum DIV512 SYSCLK divided by 512
+
+   type APB_Clock_Divider_Type is (DIV1, DIV2, DIV4, DIV8, DIV16);
+   --  APB1 APB2 Clock Source type
+   --
+   --  @enum DIV1 HCLK not divided
+   --  @enum DIV2 HCLK divided by 2
+   --  @enum DIV4 HCLK divided by 4
+   --  @enum DIV8 HCLK divided by 8
+   --  @enum DIV16 HCLK divided by 16
+
+   type Clocks_Init_Type is
+      record
+         Clock               : Clock_Select_Type;
+         System_Clock_Source : System_Clock_Source_Type;
+         AHB_Clock_Divider   : AHB_Clock_Divider_Type;
+         APB1_Clock_Divider  : APB_Clock_Divider_Type;
+         APB2_Clock_Divider  : APB_Clock_Divider_Type;
+      end record;
+   --  Reset and Clock Control (RCC) System, AHB and APB busses clock
+   --  configuration type
+   --
+   --  @field Clock The clock to be configured
+   --  @field System_Clock_Source The clock source used as system clock
+   --  @field AHB_Clock_Divider The AHB clock (HCLK) divider
+   --  @field APB1_Clock_Divider The APB1 clock (PCLK1) divider
+   --  @field APB2_Clock_Divider The APB2 clock (PCLK2) divider
+
+   subtype Latency_Type is HAL.Flash.Latency_Type;
+   --  FLASH Latency type
+
    ---------------------------------------------------------------------------
    function Oscillators_Config (Init : Oscillators_Init_Type)
       return Status_Type;
@@ -209,6 +270,20 @@ package HAL.RCC is
    --    either ON or BYPASS;
    --
    --  @param Init Configuration information for the RCC oscillators
+   --  @return Status of operations.
+
+   ---------------------------------------------------------------------------
+   function Clocks_Config (Init          : Clocks_Init_Type;
+                           Flash_Latency : Latency_Type)
+      return Status_Type;
+   --  Initializes the CPU, AHB and APB buses clocks according to the
+   --  specified parameters.
+   --
+   --  Implementation notes:
+   --  - Based on function HAL_RCC_ClockConfig;
+   --
+   --  @param Init Configuration information for the RCC oscillators
+   --  @param Flash_Latency FLASH Latency
    --  @return Status of operations.
 
    ---------------------------------------------------------------------------
