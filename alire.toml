@@ -1,6 +1,6 @@
 name = "stm32l0xx_hal"
 description = "HAL library for STMicroelectronics' STM32L0 MCU series"
-version = "0.1.0-dev"
+version = "0.1.1-dev"
 
 authors = ["Emanuele Zarfati"]
 maintainers = ["Emanuele Zarfati <zarfati.tecno@gmail.com>"]
@@ -8,7 +8,7 @@ maintainers-logins = ["ezetec"]
 
 [[depends-on]]
 gnat_arm_elf = "^13.2.1"
-stm32l0xx_cmsis = "0.1.0-dev"
+stm32l0xx_cmsis = "1.0.0"
 
 [[pins]]
 stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="a13abed132283682e037f854180b20844eaaee76"}
