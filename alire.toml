@@ -1,6 +1,6 @@
 name = "stm32l0xx_hal"
 description = "HAL library for STMicroelectronics' STM32L0 MCU series"
-version = "0.1.3-dev"
+version = "0.1.4-dev"
 
 authors = ["Emanuele Zarfati"]
 maintainers = ["Emanuele Zarfati <zarfati.tecno@gmail.com>"]
@@ -11,7 +11,7 @@ gnat_arm_elf = "^13.2.1"
 stm32l0xx_cmsis = "1.0.0"
 
 [[pins]]
-stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="9a6e80e462a8170ad5e1188dcc77cbfc8f358f7f"}
+stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="339d22587492f47bfa50ac4977bf9a6458344fbc"}
 
 [build-switches]
 "*".ada_version = ["-gnatX0"]
