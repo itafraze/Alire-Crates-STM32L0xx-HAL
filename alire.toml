@@ -11,7 +11,7 @@ gnat_arm_elf = "^13.2.1"
 stm32l0xx_cmsis = "1.0.0"
 
 [[pins]]
-stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="339d22587492f47bfa50ac4977bf9a6458344fbc"}
+stm32l0xx_cmsis = { url='https://gitlab.com/ezetec-alire-crates/stm32l0xx-cmsis.git', commit="caee4e1efd388f22cf5cd4cf6c59d0c6c5b0abaf"}
 
 [build-switches]
 "*".ada_version = ["-gnatX0"]
