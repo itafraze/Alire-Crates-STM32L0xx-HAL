@@ -22,10 +22,15 @@
 ------------------------------------------------------------------------------
 
 with AUnit.Assertions;
+with AUnit.Test_Caller;
 
 package body HAL.Test
 is
    use AUnit.Assertions;
+
+   package Caller_Reset
+      is new AUnit.Test_Caller (Reset_Fixture);
+   --
 
    package Caller_Init
       is new AUnit.Test_Caller (Init_Fixture);

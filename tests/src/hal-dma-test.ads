@@ -22,8 +22,23 @@
 ------------------------------------------------------------------------------
 
 with AUnit.Test_Suites;
+with HAL.Test;
 
 package HAL.DMA.Test is
+
+   type Reset_Fixture is
+      new HAL.Test.Reset_Fixture with null record;
+   --  System status after reset
+
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (T : in out Reset_Fixture);
+
+   type Init_Defaults_Fixture is
+      new Reset_Fixture with null record;
+   --  System status after reset and HAL.DMA.Init
+
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (T : in out Init_Defaults_Fixture);
 
    -------------------------------------------------------------------------
    function Suite
