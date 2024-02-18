@@ -21,38 +21,31 @@
 --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-with AUnit.Reporter.Text;
-with AUnit.Run;
-with Suite;
+with AUnit.Test_Fixtures;
+with AUnit.Test_Suites;
 
-with Handlers;
-pragma Unreferenced (Handlers);
+package HAL.Test is
 
-procedure Tests
-is
-   use Ada.Text_IO;
-   use AUnit.Reporter.Text;
-   use AUnit.Run;
+   type Reset_Fixture is
+      new AUnit.Test_Fixtures.Test_Fixture with null record;
+   --  System status after reset
 
-   Reporter : Text_Reporter;
-   --
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (UNUSED_T : in out Reset_Fixture);
 
-   procedure Runner
-      is new Test_Runner (Suite.Suite);
-   --
+   type Init_Fixture is
+      new Reset_Fixture with null record;
+   --  System status after reset and HAL.Init
 
-   procedure Os_Abort
-      with Import, External_Name => "abort", No_Return;
-   --
-begin
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (T : in out Init_Fixture);
 
-   New_Line; Put_Line ("STM32L0xx HAL library tests start");
+   -------------------------------------------------------------------------
+   function Suite
+      return AUnit.Test_Suites.Access_Test_Suite;
 
-   Set_Use_ANSI_Colors (Reporter, True);
-   Runner (Reporter);
+   procedure MSP_Init
+      with Export;
+      --  Executed by HAL.Init
 
-   New_Line; Put_Line ("STM32L0xx HAL library tests completed");
-   Os_Abort;
-
-end Tests;
+end HAL.Test;

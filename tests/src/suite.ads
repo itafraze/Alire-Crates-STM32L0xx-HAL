@@ -21,7 +21,12 @@
 --
 ------------------------------------------------------------------------------
 
-procedure MSP_Init
-   with Export;
-   --  Example implementation of procedure MSP_Init, which is executed by
-   --  HAL.Init
+with AUnit.Test_Suites;
+
+package Suite is
+
+   -------------------------------------------------------------------------
+   function Suite
+      return AUnit.Test_Suites.Access_Test_Suite;
+
+end Suite;
