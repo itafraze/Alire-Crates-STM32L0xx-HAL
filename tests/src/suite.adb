@@ -21,11 +21,22 @@
 --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
+with HAL.Test;
 
-procedure MSP_Init
-is
-   use Ada.Text_IO;
-begin
-   Put_Line ("User MSP_Init executed");
-end MSP_Init;
+package body Suite is
+
+   Result : aliased AUnit.Test_Suites.Test_Suite;
+   --  Statically allocated test suite
+
+   function Suite
+      return AUnit.Test_Suites.Access_Test_Suite
+   is
+   begin
+
+      Result.Add_Test (HAL.Test.Suite);
+
+      return Result'Access;
+
+   end Suite;
+
+end Suite;

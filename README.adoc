@@ -20,6 +20,18 @@ link:https://github.com/STMicroelectronics/stm32l0xx_hal_driver/tree/v1.10.6[v1.
 
 |===
 
+== Repository structure
+
+.Content
+[cols="1,3",width=75%,frame=none,grid=rows,role=center]
+|===
+|Path|Description
+
+|link:./src/[`src/`] | Library source files
+
+|link:./tests/[`tests/`] | Library test subproject
+
+|===
 
 == License
 
@@ -41,9 +53,55 @@ using the
 link:https://gitlab.com/ezetec-alire-crates/stm32l0xx-hal/-/issues[issues
 tracker].
 
-Workflow:: The project development workflow is inspired by the
+Workflow::
+The project development workflow is inspired by the
 link:https://nvie.com/posts/a-successful-git-branching-model/[GitFlow]
 branching model. Although strict naming conventions are not enforced,
 `feature` branches should branch from `develop` and `fix` branches from `main`
 or latest `release`.
 
+Alire aliases::
+Alire aliases can be configured to simplify frequent toolchain operations,
+especially if involving the `.gpr` project file or environment variables
+provided by Alire. Script file link:make-aliases.sh[make-aliases.sh] is
+provided to configure the following aliases:
++
+* `alr emu`: (tests subproject) Execute tests in emulated environment;
+* `alr emugdb`: (tests subproject) Execute tests in emulated environment with
+GDB server enabled;
+* `alr gdbemu`: (tests subproject) Launch GDB and connect to emulated
+tests instance.
++
+These aliases use GNATemu and GDB, hence they require `arm-eabi-gnatemu` and
+`arm-eabi-gdb` to be available in `$PATH`. At the time of writing, the former
+is not available through Alire. However non-GNATPro users may still find
+available ARM ELF GNAT Community Edition, which ships also the
+`arm-eabi-gnatemu` binary, at AdaCore's
+link:https://www.adacore.com/download[Download page].
+
+Tests and debug on emulated target::
+The target platform can be emulated using GNATemu. Sub-crate project
+link:./tests/tests.gpr[`tests/tests.gpr`] supplies the `Emulator` package with
+minimal working configuration. To run `tests` in the emulated environment,
+execute from within the sub-project folder the following command.
++
+.Start tests in emulation environment
+[source,console]
+----
+$ alr emu
+----
++
+To debug `tests`, within its folder run the following commands, in two
+separated terminals, to start GNATemu followed by GDB.
++
+.Start GNATemu
+[source,console]
+----
+$ alr emugdb
+----
++
+.Start GDB
+[source,console]
+----
+$ alr gdbemu
+----

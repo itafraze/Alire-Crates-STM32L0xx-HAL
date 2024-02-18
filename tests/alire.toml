@@ -11,12 +11,24 @@ executables = ["tests"]
 [[depends-on]]
 gnat_arm_elf = "^13.2.1"
 stm32l0xx_hal = "*"
+aunit = "^24.0.0"
 
 [[pins]]
 stm32l0xx_hal = { path='..' }
 
 [build-profiles]
-"*" = "development"
+"stm32l0xx_hal" = "validation"
+
+[configuration.values]
+stm32l0xx_cmsis.Device = "stm32l011d4"
+stm32l0xx_cmsis.With_Startup = false
+
+[gpr-externals]
+EMU_MODE = ["run", "debug"]
+
+[gpr-set-externals]
+AUNIT_RUNTIME = "zfp-cross"
+AUNIT_BUILD_MODE = "Install"
 
 [build-switches]
 "*".Ada_Version = "Ada2022"
