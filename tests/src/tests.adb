@@ -26,8 +26,6 @@ with AUnit.Reporter.Text;
 with AUnit.Run;
 with Suite;
 
-with MSP_Init;
-pragma Unreferenced (MSP_Init);
 with Handlers;
 pragma Unreferenced (Handlers);
 

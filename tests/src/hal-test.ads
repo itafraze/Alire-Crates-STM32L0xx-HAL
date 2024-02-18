@@ -21,7 +21,31 @@
 --
 ------------------------------------------------------------------------------
 
-procedure MSP_Init
-   with Export;
-   --  Example implementation of procedure MSP_Init, which is executed by
-   --  HAL.Init
+with AUnit.Test_Fixtures;
+with AUnit.Test_Suites;
+
+package HAL.Test is
+
+   type Reset_Fixture is
+      new AUnit.Test_Fixtures.Test_Fixture with null record;
+   --  System status after reset
+
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (UNUSED_T : in out Reset_Fixture);
+
+   type Init_Fixture is
+      new Reset_Fixture with null record;
+   --  System status after reset and HAL.Init
+
+   -------------------------------------------------------------------------
+   overriding procedure Set_Up (T : in out Init_Fixture);
+
+   -------------------------------------------------------------------------
+   function Suite
+      return AUnit.Test_Suites.Access_Test_Suite;
+
+   procedure MSP_Init
+      with Export;
+      --  Executed by HAL.Init
+
+end HAL.Test;

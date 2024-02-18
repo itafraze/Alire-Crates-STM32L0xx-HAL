@@ -21,6 +21,8 @@
 --
 ------------------------------------------------------------------------------
 
+with HAL.Test;
+
 package body Suite is
 
    Result : aliased AUnit.Test_Suites.Test_Suite;
@@ -30,6 +32,8 @@ package body Suite is
       return AUnit.Test_Suites.Access_Test_Suite
    is
    begin
+
+      Result.Add_Test (HAL.Test.Suite);
 
       return Result'Access;
 
