@@ -77,7 +77,7 @@ is
       Status : Status_Type;
    begin
 
-      Status := HAL.Init;
+      Status := Init;
 
       Assert (
          Status = OK,
