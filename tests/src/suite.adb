@@ -21,40 +21,18 @@
 --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-with AUnit.Reporter.Text;
-with AUnit.Run;
-with Suite;
+package body Suite is
 
-with MSP_Init;
-pragma Unreferenced (MSP_Init);
-with Handlers;
-pragma Unreferenced (Handlers);
+   Result : aliased AUnit.Test_Suites.Test_Suite;
+   --  Statically allocated test suite
 
-procedure Tests
-is
-   use Ada.Text_IO;
-   use AUnit.Reporter.Text;
-   use AUnit.Run;
+   function Suite
+      return AUnit.Test_Suites.Access_Test_Suite
+   is
+   begin
 
-   Reporter : Text_Reporter;
-   --
+      return Result'Access;
 
-   procedure Runner
-      is new Test_Runner (Suite.Suite);
-   --
+   end Suite;
 
-   procedure Os_Abort
-      with Import, External_Name => "abort", No_Return;
-   --
-begin
-
-   New_Line; Put_Line ("STM32L0xx HAL library tests start");
-
-   Set_Use_ANSI_Colors (Reporter, True);
-   Runner (Reporter);
-
-   New_Line; Put_Line ("STM32L0xx HAL library tests completed");
-   Os_Abort;
-
-end Tests;
+end Suite;
