@@ -97,7 +97,7 @@ package body HAL.DMA is
       Handle.Error_Code := NONE;
       Handle.State := READY;
 
-      return ERROR;
+      return OK;
    end Init;
 
 end HAL.DMA;

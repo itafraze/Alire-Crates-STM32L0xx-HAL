@@ -21,6 +21,7 @@
 --
 ------------------------------------------------------------------------------
 
+with AUnit.Test_Caller;
 with AUnit.Test_Fixtures;
 with AUnit.Test_Suites;
 
@@ -32,6 +33,10 @@ package HAL.Test is
 
    -------------------------------------------------------------------------
    overriding procedure Set_Up (UNUSED_T : in out Reset_Fixture);
+
+   package Caller_Reset
+      is new AUnit.Test_Caller (Reset_Fixture);
+   --
 
    type Init_Fixture is
       new Reset_Fixture with null record;

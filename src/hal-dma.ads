@@ -117,16 +117,17 @@ package HAL.DMA is
    --
 
    type Error_Code_Type is
-      (NONE, TE, NO_TRANSFER, TIMEOUT, NOT_SUPPORTED);
+      (NONE, TE, NO_TRANSFER, TIMEOUT, NOT_SUPPORTED)
+      with Default_Value => NONE;
    --
 
    type Handle_Type is
       record
-         Instance : Instance_Type;
-         Channel : Channel_Type;
+         Instance : Instance_Type := Instance_Type'First;
+         Channel : Channel_Type := Channel_Type'First;
          Init : Init_Type;
          State : State_Type;
-         Parent : System.Address;
+         Parent : System.Address := System.Null_Address;
          Transfer_Complete : Callback_Access_Type;
          Transfer_Half_Complete : Callback_Access_Type;
          Transfer_Error : Callback_Access_Type;
