@@ -21,24 +21,12 @@
 --
 ------------------------------------------------------------------------------
 
-with HAL.Test;
-with HAL.DMA.Test;
+with AUnit.Test_Suites;
 
-package body Suite is
+package HAL.DMA.Test is
 
-   Result : aliased AUnit.Test_Suites.Test_Suite;
-   --  Statically allocated test suite
-
+   -------------------------------------------------------------------------
    function Suite
-      return AUnit.Test_Suites.Access_Test_Suite
-   is
-   begin
+      return AUnit.Test_Suites.Access_Test_Suite;
 
-      Result.Add_Test (HAL.Test.Suite);
-      Result.Add_Test (HAL.DMA.Test.Suite);
-
-      return Result'Access;
-
-   end Suite;
-
-end Suite;
+end HAL.DMA.Test;
