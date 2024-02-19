@@ -50,9 +50,17 @@ package HAL.TIM is
    --
 
    type Counter_Mode_Type is
-      (UP, DOWN, CENTERALIGNED_1, CENTERALIGNED_2, CENTERALIGNED_3)
+      (UP, DOWN, CENTER_ALIGNED_1, CENTER_ALIGNED_2, CENTER_ALIGNED_3)
       with Default_Value => UP;
    --
+   --  @enum UP Counter used as up-counter
+   --  @enum DOWN Counter used as down-counter
+   --  @enum CENTERALIGNED_1 The counter counts up and down alternatively.
+   --    Output compare are set only when the counter is counting down.
+   --  @enum CENTERALIGNED_2 The counter counts up and down alternatively.
+   --    Output compare are set only when the counter is counting up.
+   --  @enum CENTERALIGNED_3 The counter counts up and down alternatively.
+   --    Output compare are set both when the counter is counting up or down.
 
    type Clock_Division_Type is
       (DIV1, DIV2, DIV4)
@@ -100,7 +108,7 @@ package HAL.TIM is
       with Default_Value => RESET;
    --
 
-   type Channel_State_Array_Type is
+   type Channels_State_Type is
       array (Channel_Type)
       of Channel_State_Type;
    --
@@ -117,7 +125,7 @@ package HAL.TIM is
          Active_Channel : Active_Channel_Type := (Valid => False);
          DMA_Handle : access HAL.DMA.Handle_Type;
          State : State_Type;
-         Channels_State : Channel_State_Array_Type;
+         Channels_State : Channels_State_Type;
          Msp_Init : Callback_Access_Type;
          IC_Capture : Callback_Access_Type;
          OC_Delay_Elapsed : Callback_Access_Type;
