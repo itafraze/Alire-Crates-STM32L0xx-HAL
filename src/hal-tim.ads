@@ -21,8 +21,10 @@
 --
 ------------------------------------------------------------------------------
 
-with HAL.DMA;
 with CMSIS.Device.TIM.Instances;
+   use all type CMSIS.Device.TIM.Instances.Instance_Type;
+   use all type CMSIS.Device.TIM.Instances.Channel_Type;
+with HAL.DMA;
 
 package HAL.TIM is
    --  HAL TIM Generic Driver
@@ -159,5 +161,13 @@ package HAL.TIM is
    --
    --  @param Handle
    --  @returns Operations success status
+
+private
+
+   for Clock_Division_Type use (
+      DIV1 => 2#00#,
+      DIV2 => 2#01#,
+      DIV4 => 2#10#);
+   --
 
 end HAL.TIM;
