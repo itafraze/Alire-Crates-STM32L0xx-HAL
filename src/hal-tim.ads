@@ -47,7 +47,12 @@ package HAL.TIM is
    --
 
    type Period_Type is
-      new Natural range 0 .. 2**16 - 1
+      mod 2 ** 16
+      with Default_Value => 0;
+   --
+
+   type Pulse_Type is
+      new Period_Type
       with Default_Value => 0;
    --
 
@@ -68,6 +73,10 @@ package HAL.TIM is
       (DIV1, DIV2, DIV4)
       with Default_Value => DIV1;
    --
+   --
+   --  @enum DIV1
+   --  @enum DIV2
+   --  @enum DIV4
 
    type Auto_Reload_Preload_Type is
       new Boolean
@@ -91,6 +100,52 @@ package HAL.TIM is
    --  @field Clock_Division
    --  @field Auto_Reload_Preload Preload buffered or unbuffered
 
+   type Output_Compare_And_PWM_Mode_Type is
+      (TIMING, ACTIVE, INACTIVE, TOGGLE, FORCED_INACTIVE, FORCED_ACTIVE,
+      PWM_1, PWM_2);
+   --  Timer (TIM) Output Compare and PWM modes
+   --
+   --  @enum TIMING
+   --  @enum ACTIVE
+   --  @enum INACTIVE
+   --  @enum TOGGLE
+   --  @enum FORCED_INACTIVE
+   --  @enum FORCED_ACTIVE
+   --  @enum PWM_1
+   --  @enum PWM_2
+
+   type Output_Compare_Polarity_Type is
+      (HIGH, LOW)
+      with Default_Value => HIGH;
+   --  Capture/Compare output polarity
+   --
+   --  @enum HIGH
+   --  @enum LOW
+
+   type Fast_Mode_Type is
+      new Boolean
+      with Default_Value => False;
+   --
+
+   type OC_Init_Type is
+      record
+         Mode : Output_Compare_And_PWM_Mode_Type;
+         Pulse : Pulse_Type;
+         Polarity : Output_Compare_Polarity_Type;
+         Fast_Mode : Fast_Mode_Type;
+      end record;
+   --  Timer (TIM) Output Compare configuration definition
+   --
+   --  @field Mode Specifies the TIM mode
+   --  @field Pulse Specifies the pulse value to be loaded into the Capture
+   --    Compare Register
+   --  @field Polarity Specifies the output polarity
+   --  @field Fast_Mode Output Compare fast mode disable or enabled. This is
+   --    valid only in PWM1 and PWM2 modes.
+
+   subtype PWM_Init_Type is OC_Init_Type;
+   --
+
    type Active_Channel_Type (Valid : Boolean := False) is
       record
          case Valid is
@@ -99,16 +154,28 @@ package HAL.TIM is
          end case;
       end record;
    --
+   --
+   --  @field Channel
 
    type State_Type is
       (RESET, READY, BUSY, TIMEOUT, ERROR)
       with Default_Value => RESET;
    --
+   --
+   --  @enum RESET
+   --  @enum READY
+   --  @enum BUSY
+   --  @enum TIMEOUT
+   --  @enum ERROR
 
    type Channel_State_Type is
       (RESET, READY, BUSY)
       with Default_Value => RESET;
    --
+   --
+   --  @enum RESET
+   --  @enum READY
+   --  @enum BUSY
 
    type Channels_State_Type is
       array (Channel_Type)
@@ -162,12 +229,40 @@ package HAL.TIM is
    --  @param Handle
    --  @returns Operations success status
 
+   -------------------------------------------------------------------------
+   function PWM_Config_Channel (Handle  : in out Handle_Type;
+                                Init    : PWM_Init_Type;
+                                Channel : Channel_Type)
+      return Status_Type;
+   --  Initialises the TIM Pulse-Width Modulation (PWM) channel
+   --
+   --  @param Handle
+   --  @param Init
+   --  @param Channel
+   --  @returns Operations success status
+
 private
 
    for Clock_Division_Type use (
       DIV1 => 2#00#,
       DIV2 => 2#01#,
       DIV4 => 2#10#);
+   --
+
+   for Output_Compare_And_PWM_Mode_Type use (
+      TIMING =>          2#000#,
+      ACTIVE =>          2#001#,
+      INACTIVE =>        2#010#,
+      TOGGLE =>          2#011#,
+      FORCED_INACTIVE => 2#100#,
+      FORCED_ACTIVE =>   2#101#,
+      PWM_1 =>           2#110#,
+      PWM_2 =>           2#111#);
+   --
+
+   for Output_Compare_Polarity_Type use (
+      HIGH => 2#0#,
+      LOW => 2#1#);
    --
 
 end HAL.TIM;
