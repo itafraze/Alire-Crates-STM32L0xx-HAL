@@ -257,6 +257,20 @@ package HAL.TIM is
    --  @param Channel Timer (TIM) channels to be enabled
    --  @returns Operations success status
 
+   ---------------------------------------------------------------------------
+   function PWM_Stop (Handle  : in out Handle_Type;
+                      Channel : Channel_Type)
+      return Status_Type;
+   --  Stop the PWM signal generation.
+   --
+   --  TODO:
+   --  - Add precondition contract IS_TIM_CCX_INSTANCE
+   --  - Add precondition contract IS_TIM_CC1_INSTANCE
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Channel Timer (TIM) channels to be disabled
+   --  @returns Operations success status
+
 private
 
    for Clock_Division_Type use (

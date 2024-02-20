@@ -262,4 +262,20 @@ package body HAL.TIM is
 
    end PWM_Start;
 
+   ---------------------------------------------------------------------------
+   function PWM_Stop (Handle  : in out Handle_Type;
+                      Channel : Channel_Type)
+      return Status_Type is
+   begin
+
+      --  Disable the Capture compare channel and the Peripheral
+      CCx_Channel_Command (Handle.Instance, Channel, False);
+      TIMx (Handle.Instance).CR1.CEN := 2#0#;
+
+      Handle.Channels_State (Channel) := READY;
+
+      return OK;
+
+   end PWM_Stop;
+
 end HAL.TIM;
