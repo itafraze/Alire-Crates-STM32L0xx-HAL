@@ -26,12 +26,7 @@ with CMSIS.Device.DMA;
 package body HAL.DMA is
 
    function Init (Handle : in out Handle_Type)
-      return Status_Type
-   is
-      use CMSIS.Device.DMA;
-      use CMSIS.Device.DMA.Instances;
-
-      type All_Channel_Type is range 0 .. 6;
+      return Status_Type is
       --  Implementation notes:
       --  -  Aligned with CMSIS'
       --       src/stm32l0x1/category-2-3-5/cmsis-device-dma-instances.ads
@@ -40,6 +35,11 @@ package body HAL.DMA is
       --  - Find a better way to align with the available channels without
       --    having to provide two separate implementations
       --  - Add support to Lock
+
+      use CMSIS.Device.DMA;
+      use CMSIS.Device.DMA.Instances;
+
+      type All_Channel_Type is range 0 .. 6;
 
       CCRx : constant array (All_Channel_Type) of
             access CCR_Register := [
