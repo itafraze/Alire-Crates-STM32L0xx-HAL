@@ -409,6 +409,51 @@ package body HAL.RCC is
    end Get_System_Clock_Frequency;
 
    ---------------------------------------------------------------------------
+   function Get_HCLK_Frequency
+      return Natural is
+      (CMSIS.Device.System.Core_Clock);
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK1_Frequency
+      return Natural is
+      --
+      use CMSIS.Device.RCC;
+
+      Prescaler : constant Natural :=
+         Natural (RCC_Periph.CFGR.PPRE.Arr (1));
+      Frequency : Natural := Get_HCLK_Frequency;
+   begin
+
+      if Prescaler >= 2#100#
+      then
+         Frequency := @ / (2 ** (Prescaler - 2#011#));
+      end if;
+
+      return Frequency;
+
+   end Get_PCLK1_Frequency;
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK2_Frequency
+      return Natural is
+      --
+      use CMSIS.Device.RCC;
+
+      Prescaler : constant Natural :=
+         Natural (RCC_Periph.CFGR.PPRE.Arr (2));
+      Frequency : Natural := Get_HCLK_Frequency;
+   begin
+
+      if Prescaler >= 2#100#
+      then
+         Frequency := @ / (2 ** (Prescaler - 2#011#));
+      end if;
+
+      return Frequency;
+
+   end Get_PCLK2_Frequency;
+
+   ---------------------------------------------------------------------------
    procedure TIM2_Clock_Enable is
       --
       use CMSIS.Device.RCC;

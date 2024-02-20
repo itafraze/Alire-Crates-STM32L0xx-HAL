@@ -298,11 +298,36 @@ package HAL.RCC is
    --  @return SYSCLK frequency
 
    ---------------------------------------------------------------------------
+   function Get_HCLK_Frequency
+      return Natural;
+   --  Returns the HCLK frequency
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK1_Frequency
+      return Natural;
+   --  Returns the PCLK1 frequency
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK2_Frequency
+      return Natural;
+   --  Returns the PCLK2 frequency
+
+   ---------------------------------------------------------------------------
    procedure TIM2_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM3_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM21_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM22_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM6_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM7_Clock_Enable;
 
 private
