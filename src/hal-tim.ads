@@ -220,25 +220,41 @@ package HAL.TIM is
    --  @field Half_Pulse
    --  @field Error
 
-   -------------------------------------------------------------------------
+   ---------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
       return Status_Type;
    --  Initialises the TIM Pulse-Width Modulation (PWM) Time Base and the
    --  associated handle
    --
-   --  @param Handle
+   --  @param Handle Timer (TIM) handle
    --  @returns Operations success status
 
-   -------------------------------------------------------------------------
+   ---------------------------------------------------------------------------
    function PWM_Config_Channel (Handle  : in out Handle_Type;
                                 Init    : PWM_Init_Type;
                                 Channel : Channel_Type)
       return Status_Type;
    --  Initialises the TIM Pulse-Width Modulation (PWM) channel
    --
-   --  @param Handle
+   --  @param Handle Timer (TIM) handle
    --  @param Init
-   --  @param Channel
+   --  @param Channel Timer (TIM) channels to be configured
+   --  @returns Operations success status
+
+   ---------------------------------------------------------------------------
+   function PWM_Start (Handle  : in out Handle_Type;
+                       Channel : Channel_Type)
+      return Status_Type;
+   --  Starts the PWM signal generation
+   --
+   --  The channel shall be in READY state
+   --
+   --  TODO:
+   --  - Add precondition contract IS_TIM_CCX_INSTANCE
+   --  - Add precondition contract IS_TIM_CC1_INSTANCE
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Channel Timer (TIM) channels to be enabled
    --  @returns Operations success status
 
 private

@@ -143,6 +143,37 @@ package body HAL.TIM is
 
    end OC4_Set_Config;
 
+   ---------------------------------------------------------------------------
+   procedure CCx_Channel_Command (Instance : Instance_Type;
+                                  Channel  : Channel_Type;
+                                  Enable   : Boolean) is
+      --  Enables or disables the Timer (TIM) Capture Compare channel
+   begin
+
+      --  Reset the CCxE bit before applying the configuration
+      case Channel is
+         when CHANNEL_1 =>
+            TIMx (Instance).CCER.CC1E := 2#0#;
+            TIMx (Instance).CCER.CC1E := Enable'Enum_Rep;
+         when CHANNEL_2 =>
+            TIMx (Instance).CCER.CC2E := 2#0#;
+            TIMx (Instance).CCER.CC2E := Enable'Enum_Rep;
+         when CHANNEL_3 =>
+            TIMx (Instance).CCER.CC3E := 2#0#;
+            TIMx (Instance).CCER.CC3E := Enable'Enum_Rep;
+         when CHANNEL_4 =>
+            TIMx (Instance).CCER.CC4E := 2#0#;
+            TIMx (Instance).CCER.CC4E := Enable'Enum_Rep;
+      end case;
+
+   end CCx_Channel_Command;
+
+   ---------------------------------------------------------------------------
+   function Is_Slave_Mode_Trigger_Enabled (Instance : Instance_Type)
+      return Boolean is
+      (TIMx (Instance).SMCR.SMS = 2#110#)
+      with Inline;
+
    -------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
       return Status_Type is
@@ -204,5 +235,31 @@ package body HAL.TIM is
       return OK;
 
    end PWM_Config_Channel;
+
+   ---------------------------------------------------------------------------
+   function PWM_Start (Handle  : in out Handle_Type;
+                       Channel : Channel_Type)
+      return Status_Type is
+   begin
+
+      --  Input checks
+      return ERROR when Handle.Channels_State (Channel) /= READY;
+
+      Handle.Channels_State (Channel) := BUSY;
+
+      --  Enable the Capture compare channel
+      CCx_Channel_Command (Handle.Instance, Channel, True);
+
+      --  Enable the Peripheral, except in trigger mode where enable is
+      --  automatically done with trigger
+      if not Supports_Slave_Mode (Handle.Instance)
+         or else not Is_Slave_Mode_Trigger_Enabled (Handle.Instance)
+      then
+         TIMx (Handle.Instance).CR1.CEN := 2#1#;
+      end if;
+
+      return OK;
+
+   end PWM_Start;
 
 end HAL.TIM;
