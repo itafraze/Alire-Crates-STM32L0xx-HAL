@@ -21,7 +21,12 @@
 --
 ------------------------------------------------------------------------------
 
+with CMSIS.Device;
+   use CMSIS.Device;
 with CMSIS.Device.TIM;
+   use CMSIS.Device.TIM;
+with CMSIS.Device.TIM.Instances;
+   use CMSIS.Device.TIM.Instances;
 
 package body HAL.TIM is
    --  HAL TIM Generic Driver body
@@ -32,10 +37,7 @@ package body HAL.TIM is
 
    -------------------------------------------------------------------------
    procedure Base_Set_Config (Instance  : Instance_Type;
-                              Base_Init : Base_Init_Type)
-   is
-      use CMSIS.Device.TIM;
-      use CMSIS.Device.TIM.Instances;
+                              Base_Init : Base_Init_Type) is
    begin
 
       --  Select the Counter Mode if supported
@@ -75,10 +77,7 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC1_Set_Config (Instance : Instance_Type;
-                             Config   : PWM_Init_Type)
-   is
-      use CMSIS.Device.TIM;
-      use CMSIS.Device.TIM.Instances;
+                             Config   : PWM_Init_Type) is
    begin
 
       TIMx (Instance).CCER.CC1E := 2#0#;
@@ -95,10 +94,7 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC2_Set_Config (Instance : Instance_Type;
-                             Config   : PWM_Init_Type)
-   is
-      use CMSIS.Device.TIM;
-      use CMSIS.Device.TIM.Instances;
+                             Config   : PWM_Init_Type) is
    begin
 
       TIMx (Instance).CCER.CC2E := 2#0#;
@@ -115,10 +111,7 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC3_Set_Config (Instance : Instance_Type;
-                             Config   : PWM_Init_Type)
-   is
-      use CMSIS.Device.TIM;
-      use CMSIS.Device.TIM.Instances;
+                             Config   : PWM_Init_Type) is
    begin
 
       TIMx (Instance).CCER.CC3E := 2#0#;
@@ -135,10 +128,7 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC4_Set_Config (Instance : Instance_Type;
-                             Config   : PWM_Init_Type)
-   is
-      use CMSIS.Device.TIM;
-      use CMSIS.Device.TIM.Instances;
+                             Config   : PWM_Init_Type) is
    begin
 
       TIMx (Instance).CCER.CC4E := 2#0#;
@@ -155,8 +145,7 @@ package body HAL.TIM is
 
    -------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
-      return Status_Type
-   is
+      return Status_Type is
       --  TODO:
       --  - Add support to Lock
 
@@ -184,12 +173,9 @@ package body HAL.TIM is
    function PWM_Config_Channel (Handle  : in out Handle_Type;
                                 Init    : PWM_Init_Type;
                                 Channel : Channel_Type)
-      return Status_Type
-   is
+      return Status_Type is
       --  TODO:
       --  - Add support to Lock
-
-      use CMSIS.Device.TIM.Instances;
    begin
 
       case Channel is
