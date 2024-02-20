@@ -408,4 +408,52 @@ package body HAL.RCC is
 
    end Get_System_Clock_Frequency;
 
+   ---------------------------------------------------------------------------
+   procedure TIM2_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM2EN := 2#1#;
+   end TIM2_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM3_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM3EN := 2#1#;
+   end TIM3_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM21_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB2ENR.TIM21EN := 2#1#;
+   end TIM21_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM22_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB2ENR.TIM22EN := 2#1#;
+   end TIM22_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM6_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM6EN := 2#1#;
+   end TIM6_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM7_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM7EN := 2#1#;
+   end TIM7_Clock_Enable;
+
 end HAL.RCC;

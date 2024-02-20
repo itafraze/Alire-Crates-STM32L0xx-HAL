@@ -297,6 +297,14 @@ package HAL.RCC is
    --
    --  @return SYSCLK frequency
 
+   ---------------------------------------------------------------------------
+   procedure TIM2_Clock_Enable;
+   procedure TIM3_Clock_Enable;
+   procedure TIM21_Clock_Enable;
+   procedure TIM22_Clock_Enable;
+   procedure TIM6_Clock_Enable;
+   procedure TIM7_Clock_Enable;
+
 private
 
    for System_Clock_Source_Type use (
