@@ -202,6 +202,14 @@ package body HAL.TIM is
    end DMA_Error_Callback;
 
    ---------------------------------------------------------------------------
+   procedure Enable (Instance : Instance_Type) is
+   begin
+
+      TIMx (Instance).CR1.CEN := 2#1#;
+
+   end Enable;
+
+   ---------------------------------------------------------------------------
    procedure Disable (Instance : Instance_Type) is
    begin
 
@@ -332,7 +340,7 @@ package body HAL.TIM is
       if not Supports_Slave_Mode (Handle.Instance)
          or else not Is_Slave_Mode_Trigger_Enabled (Handle.Instance)
       then
-         TIMx (Handle.Instance).CR1.CEN := 2#1#;
+         Enable (Handle.Instance);
       end if;
 
       return OK;
@@ -417,7 +425,7 @@ package body HAL.TIM is
       if not Supports_Slave_Mode (Handle.Instance)
          or else not Is_Slave_Mode_Trigger_Enabled (Handle.Instance)
       then
-         TIMx (Handle.Instance).CR1.CEN := 2#1#;
+         Enable (Handle.Instance);
       end if;
 
       return OK;
