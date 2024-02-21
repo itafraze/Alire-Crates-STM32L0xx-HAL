@@ -21,10 +21,142 @@
 --
 ------------------------------------------------------------------------------
 
+with CMSIS.Device;
 with CMSIS.Device.DMA;
+   use CMSIS.Device.DMA;
+with CMSIS.Device.DMA.Instances;
+   use CMSIS.Device.DMA.Instances;
+with System.Storage_Elements;
 
 package body HAL.DMA is
 
+   type Interrupt_Type is
+      (TRANSFER_COMPLETE, HALF_TRANSFER, TRANSFER_ERROR);
+   --
+
+   ---------------------------------------------------------------------------
+   procedure Set_Channel (Handle : Handle_Type;
+                          Enable : Boolean) is
+      --  Enable or disable the specified DMA Channel
+
+      CCRx : constant not null access CCR_Register := (
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).CCR1'Access,
+            when CHANNEL_2 => DMAx (Handle.Instance).CCR2'Access,
+            when CHANNEL_3 => DMAx (Handle.Instance).CCR3'Access,
+            when CHANNEL_4 => DMAx (Handle.Instance).CCR4'Access,
+            when CHANNEL_5 => DMAx (Handle.Instance).CCR5'Access,
+            when CHANNEL_6 => DMAx (Handle.Instance).CCR6'Access,
+            when CHANNEL_7 => DMAx (Handle.Instance).CCR7'Access);
+   begin
+
+         CCRx.EN := Enable'Enum_Rep;
+
+   end Set_Channel;
+
+   ---------------------------------------------------------------------------
+   procedure Enable (Handle : Handle_Type;
+                     Enable : Boolean := True)
+      renames Set_Channel;
+
+   ---------------------------------------------------------------------------
+   procedure Disable (Handle : Handle_Type;
+                      Enable : Boolean := False)
+      renames Set_Channel;
+
+   ---------------------------------------------------------------------------
+   procedure Set_Channel_IT (Handle    : Handle_Type;
+                             Interrupt : Interrupt_Type;
+                             Enable    : Boolean) is
+      --  Enable the specified DMA Channel interrupts
+
+      CCRx : constant not null access CCR_Register := (
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).CCR1'Access,
+            when CHANNEL_2 => DMAx (Handle.Instance).CCR2'Access,
+            when CHANNEL_3 => DMAx (Handle.Instance).CCR3'Access,
+            when CHANNEL_4 => DMAx (Handle.Instance).CCR4'Access,
+            when CHANNEL_5 => DMAx (Handle.Instance).CCR5'Access,
+            when CHANNEL_6 => DMAx (Handle.Instance).CCR6'Access,
+            when CHANNEL_7 => DMAx (Handle.Instance).CCR7'Access);
+   begin
+
+      case Interrupt is
+         when TRANSFER_COMPLETE => CCRx.TCIE := Enable'Enum_Rep;
+         when HALF_TRANSFER => CCRx.HTIE := Enable'Enum_Rep;
+         when TRANSFER_ERROR => CCRx.TEIE := Enable'Enum_Rep;
+      end case;
+
+   end Set_Channel_IT;
+
+   ---------------------------------------------------------------------------
+   procedure Enable_IT (Handle    : Handle_Type;
+                        Interrupt : Interrupt_Type;
+                        Enable    : Boolean := True)
+      renames Set_Channel_IT;
+
+   ---------------------------------------------------------------------------
+   procedure Set_Config (Handle      : Handle_Type;
+                         Source      : Address_Type;
+                         Destination : Address_Type;
+                         Length      : Transfer_Length_Type) is
+      --  Sets the DMA Transfer parameter
+      use CMSIS.Device;
+
+      Peripheral_Address : constant UInt32 := UInt32 (
+         System.Storage_Elements.To_Integer (
+            case Handle.Init.Direction is
+               when MEMORY_TO_PERIPHERAL => Destination,
+               when others => Source));
+      Memory_Address : constant UInt32 := UInt32 (
+         System.Storage_Elements.To_Integer (
+            case Handle.Init.Direction is
+               when MEMORY_TO_PERIPHERAL => Source,
+               when others => Destination));
+   begin
+
+      --  Clear all flags and configure DMA Channel data length
+      case All_Channel_Type (Handle.Channel) is
+         when CHANNEL_1 =>
+            DMAx (Handle.Instance).IFCR.CGIF1 := 2#1#;
+            DMAx (Handle.Instance).CNDTR1.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR1 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR1 := Memory_Address;
+         when CHANNEL_2 =>
+            DMAx (Handle.Instance).IFCR.CGIF2 := 2#1#;
+            DMAx (Handle.Instance).CNDTR2.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR2 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR2 := Memory_Address;
+         when CHANNEL_3 =>
+            DMAx (Handle.Instance).IFCR.CGIF3 := 2#1#;
+            DMAx (Handle.Instance).CNDTR3.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR3 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR3 := Memory_Address;
+         when CHANNEL_4 =>
+            DMAx (Handle.Instance).IFCR.CGIF4 := 2#1#;
+            DMAx (Handle.Instance).CNDTR4.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR4 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR4 := Memory_Address;
+         when CHANNEL_5 =>
+            DMAx (Handle.Instance).IFCR.CGIF5 := 2#1#;
+            DMAx (Handle.Instance).CNDTR5.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR5 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR5 := Memory_Address;
+         when CHANNEL_6 =>
+            DMAx (Handle.Instance).IFCR.CGIF6 := 2#1#;
+            DMAx (Handle.Instance).CNDTR6.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR6 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR6 := Memory_Address;
+         when CHANNEL_7 =>
+            DMAx (Handle.Instance).IFCR.CGIF7 := 2#1#;
+            DMAx (Handle.Instance).CNDTR7.NDT := CNDTR_NDT_Field (Length);
+            DMAx (Handle.Instance).CPAR7 := Peripheral_Address;
+            DMAx (Handle.Instance).CMAR7 := Memory_Address;
+      end case;
+
+   end Set_Config;
+
+   ---------------------------------------------------------------------------
    function Init (Handle : in out Handle_Type)
       return Status_Type is
       --  Implementation notes:
@@ -36,23 +168,15 @@ package body HAL.DMA is
       --    having to provide two separate implementations
       --  - Add support to Lock
 
-      use CMSIS.Device.DMA;
-      use CMSIS.Device.DMA.Instances;
-
-      type All_Channel_Type is range 0 .. 6;
-
-      CCRx : constant array (All_Channel_Type) of
-            access CCR_Register := [
-         DMAx (Handle.Instance).CCR1'Access,
-         DMAx (Handle.Instance).CCR2'Access,
-         DMAx (Handle.Instance).CCR3'Access,
-         DMAx (Handle.Instance).CCR4'Access,
-         DMAx (Handle.Instance).CCR5'Access,
-         DMAx (Handle.Instance).CCR6'Access,
-         DMAx (Handle.Instance).CCR7'Access];
-
-      Channel : constant All_Channel_Type :=
-         Channel_Type'Pos (Handle.Channel);
+      CCRx : constant not null access CCR_Register := (
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).CCR1'Access,
+            when CHANNEL_2 => DMAx (Handle.Instance).CCR2'Access,
+            when CHANNEL_3 => DMAx (Handle.Instance).CCR3'Access,
+            when CHANNEL_4 => DMAx (Handle.Instance).CCR4'Access,
+            when CHANNEL_5 => DMAx (Handle.Instance).CCR5'Access,
+            when CHANNEL_6 => DMAx (Handle.Instance).CCR6'Access,
+            when CHANNEL_7 => DMAx (Handle.Instance).CCR7'Access);
 
       CxS_Value : constant CSELR_C1S_Field :=
          Request_Type'Pos (Handle.Init.Request);
@@ -62,7 +186,7 @@ package body HAL.DMA is
       Handle.State := BUSY;
 
       --  DMA channel configuration
-      CCRx (Channel).all := (
+      CCRx.all := (
          @ with delta
             PL => Handle.Init.Priority'Enum_Rep,
             MSIZE => Handle.Init.Memory_Data_Alignment'Enum_Rep,
@@ -82,14 +206,14 @@ package body HAL.DMA is
       --  Set request selection
       if Handle.Init.Direction /= MEMORY_TO_MEMORY
       then
-         case Channel is
-            when 0 => DMAx (Handle.Instance).CSELR.C1S := CxS_Value;
-            when 1 => DMAx (Handle.Instance).CSELR.C2S := CxS_Value;
-            when 2 => DMAx (Handle.Instance).CSELR.C3S := CxS_Value;
-            when 3 => DMAx (Handle.Instance).CSELR.C4S := CxS_Value;
-            when 4 => DMAx (Handle.Instance).CSELR.C5S := CxS_Value;
-            when 5 => DMAx (Handle.Instance).CSELR.C6S := CxS_Value;
-            when 6 => DMAx (Handle.Instance).CSELR.C7S := CxS_Value;
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).CSELR.C1S := CxS_Value;
+            when CHANNEL_2 => DMAx (Handle.Instance).CSELR.C2S := CxS_Value;
+            when CHANNEL_3 => DMAx (Handle.Instance).CSELR.C3S := CxS_Value;
+            when CHANNEL_4 => DMAx (Handle.Instance).CSELR.C4S := CxS_Value;
+            when CHANNEL_5 => DMAx (Handle.Instance).CSELR.C5S := CxS_Value;
+            when CHANNEL_6 => DMAx (Handle.Instance).CSELR.C6S := CxS_Value;
+            when CHANNEL_7 => DMAx (Handle.Instance).CSELR.C7S := CxS_Value;
          end case;
       end if;
 
@@ -106,9 +230,34 @@ package body HAL.DMA is
                       Destination : Address_Type;
                       Length      : Transfer_Length_Type)
       return Status_Type is
+      --  TODO:
+      --  - Add Lock support
    begin
 
-      return ERROR;
+      return BUSY when Handle.State /= READY;
+
+      --  Reset status
+      Handle.State := BUSY;
+      Handle.Error_Code := NONE;
+
+      --  Disable the peripheral before configuring the source, destination
+      --  address and the data length and clear flags
+      Disable (Handle);
+      Set_Config (Handle, Source, Destination, Length);
+
+      --  Enable interrupts
+      Enable_IT (Handle, TRANSFER_COMPLETE);
+      Enable_IT (Handle, TRANSFER_ERROR);
+      if Handle.Transfer_Half_Complete_Callback /= null
+      then
+         Enable_IT (Handle, HALF_TRANSFER);
+      else
+         Disable_IT (Handle, HALF_TRANSFER);
+      end if;
+
+      Enable (Handle);
+
+      return OK;
 
    end Start_IT;
 
