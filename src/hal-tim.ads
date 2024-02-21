@@ -182,13 +182,14 @@ package HAL.TIM is
       of Channel_State_Type;
    --
 
-   type DMA_Handle_Index_Type is
-      (UPDATE, CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4, TRIGGER)
+   type DMA_Request_Type is
+      (UPDATE, CAPTURE_COMPARE_1, CAPTURE_COMPARE_2, CAPTURE_COMPARE_3,
+         CAPTURE_COMPARE_4, TRIGGER)
       with Default_Value => UPDATE;
    --
 
    type DMA_Handles_Type is
-      array (DMA_Handle_Index_Type)
+      array (DMA_Request_Type)
       of access HAL.DMA.Handle_Type;
    --
 

@@ -202,19 +202,34 @@ package body HAL.TIM is
    end DMA_Error_Callback;
 
    ---------------------------------------------------------------------------
-   procedure Enable_DMA (Instance : Instance_Type;
-                         Channel  : Channel_Type) is
-      --  Enable the specified DMA request.
+   procedure Set_DMA_Request (Instance : Instance_Type;
+                              Request  : DMA_Request_Type;
+                              Enable   : Boolean) is
+      --  Enable or disable the specified DMA request.
    begin
 
-      case Channel is
-         when CHANNEL_1 => TIMx (Instance).DIER.CC1DE := 2#1#;
-         when CHANNEL_2 => TIMx (Instance).DIER.CC2DE := 2#1#;
-         when CHANNEL_3 => TIMx (Instance).DIER.CC3DE := 2#1#;
-         when CHANNEL_4 => TIMx (Instance).DIER.CC4DE := 2#1#;
+      case Request is
+         when UPDATE =>
+            TIMx (Instance).DIER.UDE := Enable'Enum_Rep;
+         when CAPTURE_COMPARE_1 =>
+            TIMx (Instance).DIER.CC1DE := Enable'Enum_Rep;
+         when CAPTURE_COMPARE_2 =>
+            TIMx (Instance).DIER.CC2DE := Enable'Enum_Rep;
+         when CAPTURE_COMPARE_3 =>
+            TIMx (Instance).DIER.CC3DE := Enable'Enum_Rep;
+         when CAPTURE_COMPARE_4 =>
+            TIMx (Instance).DIER.TDE := Enable'Enum_Rep;
+         when TRIGGER =>
+            TIMx (Instance).DIER.CC4DE := 2#1#;
       end case;
 
-   end Enable_DMA;
+   end Set_DMA_Request;
+
+   ---------------------------------------------------------------------------
+   procedure Enable_DMA (Instance : Instance_Type;
+                         Request  : DMA_Request_Type;
+                         Enable   : Boolean := True)
+      renames Set_DMA_Request;
 
    -------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
@@ -327,9 +342,8 @@ package body HAL.TIM is
                            Length       : HAL.DMA.Transfer_Length_Type)
       return Status_Type is
 
-      DMA_Handle_Index : constant DMA_Handle_Index_Type :=
-         DMA_Handle_Index_Type'Val (
-            DMA_Handle_Index_Type'Pos (CHANNEL_1)
+      DMA_Request : constant DMA_Request_Type := DMA_Request_Type'Val (
+            DMA_Request_Type'Pos (CAPTURE_COMPARE_1)
             + Channel_Type'Pos (Channel) - Channel_Type'Pos (CHANNEL_1));
 
       CCRx_Address : constant HAL.DMA.Address_Type := HAL.DMA.Address_Type (
@@ -343,7 +357,7 @@ package body HAL.TIM is
          renames Handle.Channels_State (Channel);
 
       DMA_Handle : access HAL.DMA.Handle_Type
-         renames Handle.DMA_Handles (DMA_Handle_Index);
+         renames Handle.DMA_Handles (DMA_Request);
 
       Status : Status_Type;
    begin
@@ -375,7 +389,7 @@ package body HAL.TIM is
 
       --  Enable the TIM Capture/Compare DMA request, the Output compare
       --  channel
-      Enable_DMA (Handle.Instance, Channel);
+      Enable_DMA (Handle.Instance, DMA_Request);
       CCx_Channel_Command (Handle.Instance, Channel, True);
 
       --  Enable the Peripheral, except in trigger mode where enable is
