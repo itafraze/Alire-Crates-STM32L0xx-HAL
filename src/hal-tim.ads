@@ -288,6 +288,17 @@ package HAL.TIM is
    --  @param Handle Timer (TIM) handle
    --  @param Autoreload Specifies the Counter register new value.
 
+   ---------------------------------------------------------------------------
+   procedure Set_Compare (Handle     : Handle_Type;
+                          Channel    : Channel_Type;
+                          Compare    : Pulse_Type);
+   --  Set the Timer (TIM) Capture Compare Register value on runtime without
+   --  calling another time ConfigChannel function.
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Channel Timer (TIM) channels to be configured
+   --  @param Compare Specifies the Capture Compare register new value
+
 private
 
    for Clock_Division_Type use (

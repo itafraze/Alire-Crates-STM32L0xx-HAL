@@ -301,4 +301,29 @@ package body HAL.TIM is
 
    end Set_Autoreload;
 
+   ---------------------------------------------------------------------------
+   procedure Set_Compare (Handle     : Handle_Type;
+                          Channel    : Channel_Type;
+                          Compare    : Pulse_Type) is
+      --
+   begin
+
+      case Channel is
+         when CHANNEL_1 =>
+            TIMx (Handle.Instance).CCR1.CCR1_L :=
+               CCR1_CCR1_L_Field (Compare);
+         when CHANNEL_2 =>
+            TIMx (Handle.Instance).CCR2.CCR2_L :=
+               CCR2_CCR2_L_Field (Compare);
+         when CHANNEL_3 =>
+            TIMx (Handle.Instance).CCR3.CCR3_L :=
+               CCR3_CCR3_L_Field (Compare);
+         when CHANNEL_4 =>
+            TIMx (Handle.Instance).CCR4.CCR4_L :=
+               CCR4_CCR4_L_Field (Compare);
+
+      end case;
+
+   end Set_Compare;
+
 end HAL.TIM;
