@@ -127,12 +127,14 @@ package HAL.DMA is
          Channel : Channel_Type := Channel_Type'First;
          Init : Init_Type;
          State : State_Type;
-         Parent : System.Address := System.Null_Address;
-         Transfer_Complete : Callback_Access_Type;
-         Transfer_Half_Complete : Callback_Access_Type;
-         Transfer_Error : Callback_Access_Type;
-         Transfer_Abort : Callback_Access_Type;
          Error_Code : Error_Code_Type;
+         Parent : System.Address := System.Null_Address;
+         --  Callbacks-related
+         MSP_Init_Callback : Callback_Access_Type;
+         Transfer_Complete_Callback : Callback_Access_Type;
+         Transfer_Half_Complete_Callback : Callback_Access_Type;
+         Transfer_Error_Callback : Callback_Access_Type;
+         Transfer_Abort_Callback : Callback_Access_Type;
       end record;
    --  Direct Memory Access (DMA) handle structure definition
    --
@@ -150,6 +152,14 @@ package HAL.DMA is
    --  @field Transfer_Abort Transfer abort callback
    --  @field Error code
 
+   subtype Address_Type is
+      System.Address;
+   --  Type of memory address
+
+   subtype Transfer_Length_Type is
+      Positive range 1 .. 2**15;
+   --
+
    ---------------------------------------------------------------------------
    function Init (Handle : in out Handle_Type)
       return Status_Type;
@@ -159,6 +169,14 @@ package HAL.DMA is
    --
    --  @param Handle Configuration information for the specified DMA Channel
    --  @return Status of operations.
+
+   ---------------------------------------------------------------------------
+   function Start_IT (Handle      : in out Handle_Type;
+                      Source      : Address_Type;
+                      Destination : Address_Type;
+                      Length      : Transfer_Length_Type)
+      return Status_Type;
+   --  Start the DMA Transfer with interrupt enabled
 
 private
 

@@ -100,4 +100,16 @@ package body HAL.DMA is
       return OK;
    end Init;
 
+   ---------------------------------------------------------------------------
+   function Start_IT (Handle      : in out Handle_Type;
+                      Source      : Address_Type;
+                      Destination : Address_Type;
+                      Length      : Transfer_Length_Type)
+      return Status_Type is
+   begin
+
+      return ERROR;
+
+   end Start_IT;
+
 end HAL.DMA;

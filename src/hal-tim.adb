@@ -174,6 +174,48 @@ package body HAL.TIM is
       (TIMx (Instance).SMCR.SMS = 2#110#)
       with Inline;
 
+   ---------------------------------------------------------------------------
+   procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type) is
+      --  DMA Delay Pulse complete callback
+      --
+      --  @param Handle Direct Memory Access (DMA) handle
+   begin
+      null;
+   end DMA_Delay_Pulse_Callback;
+
+   ---------------------------------------------------------------------------
+   procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type) is
+      --  DMA Delay Pulse half complete callback
+      --
+      --  @param Handle Direct Memory Access (DMA) handle
+   begin
+      null;
+   end DMA_Delay_Pulse_Half_Callback;
+
+   ---------------------------------------------------------------------------
+   procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type) is
+      --  DMA Delay Pulse half complete callback
+      --
+      --  @param Handle Direct Memory Access (DMA) handle
+   begin
+      null;
+   end DMA_Error_Callback;
+
+   ---------------------------------------------------------------------------
+   procedure Enable_DMA (Instance : Instance_Type;
+                         Channel  : Channel_Type) is
+      --  Enable the specified DMA request.
+   begin
+
+      case Channel is
+         when CHANNEL_1 => TIMx (Instance).DIER.CC1DE := 2#1#;
+         when CHANNEL_2 => TIMx (Instance).DIER.CC2DE := 2#1#;
+         when CHANNEL_3 => TIMx (Instance).DIER.CC3DE := 2#1#;
+         when CHANNEL_4 => TIMx (Instance).DIER.CC4DE := 2#1#;
+      end case;
+
+   end Enable_DMA;
+
    -------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
       return Status_Type is
@@ -184,9 +226,9 @@ package body HAL.TIM is
    begin
 
       if Handle.State = RESET
-         and then Handle.Msp_Init /= null
+         and then Handle.MSP_Init_Callback /= null
       then
-         Handle.Msp_Init (Handle);
+         Handle.MSP_Init_Callback (Handle);
       end if;
 
       Handle.State := BUSY;
@@ -277,6 +319,76 @@ package body HAL.TIM is
       return OK;
 
    end PWM_Stop;
+
+   ---------------------------------------------------------------------------
+   function PWM_Start_DMA (Handle       : in out Handle_Type;
+                           Channel      : Channel_Type;
+                           Data_Address : HAL.DMA.Address_Type;
+                           Length       : HAL.DMA.Transfer_Length_Type)
+      return Status_Type is
+
+      DMA_Handle_Index : constant DMA_Handle_Index_Type :=
+         DMA_Handle_Index_Type'Val (
+            DMA_Handle_Index_Type'Pos (CHANNEL_1)
+            + Channel_Type'Pos (Channel) - Channel_Type'Pos (CHANNEL_1));
+
+      CCRx_Address : constant HAL.DMA.Address_Type := HAL.DMA.Address_Type (
+         case Channel is
+            when CHANNEL_1 => TIMx (Handle.Instance).CCR1'Address,
+            when CHANNEL_2 => TIMx (Handle.Instance).CCR2'Address,
+            when CHANNEL_3 => TIMx (Handle.Instance).CCR3'Address,
+            when CHANNEL_4 => TIMx (Handle.Instance).CCR4'Address);
+
+      Channel_State : Channel_State_Type
+         renames Handle.Channels_State (Channel);
+
+      DMA_Handle : access HAL.DMA.Handle_Type
+         renames Handle.DMA_Handles (DMA_Handle_Index);
+
+      Status : Status_Type;
+   begin
+
+      return BUSY when Channel_State = BUSY;
+      return ERROR when Channel_State /= READY;
+
+      Channel_State := BUSY;
+
+      DMA_Handle.Transfer_Complete_Callback :=
+         DMA_Delay_Pulse_Callback'Access;
+      DMA_Handle.Transfer_Error_Callback :=
+         DMA_Error_Callback'Access;
+
+      --  If the half pulse callback is not provided, there is not need to
+      --  register it to the DMA driver
+      if Handle.Half_Pulse_Callback /= null
+      then
+         DMA_Handle.Transfer_Half_Complete_Callback :=
+            DMA_Delay_Pulse_Half_Callback'Access;
+      end if;
+
+      --  Enable the DMA channel
+      Status := HAL.DMA.Start_IT (Handle => DMA_Handle.all,
+                                  Source => Data_Address,
+                                  Destination => CCRx_Address,
+                                  Length => Length);
+      return Status when Status /= OK;
+
+      --  Enable the TIM Capture/Compare DMA request, the Output compare
+      --  channel
+      Enable_DMA (Handle.Instance, Channel);
+      CCx_Channel_Command (Handle.Instance, Channel, True);
+
+      --  Enable the Peripheral, except in trigger mode where enable is
+      --  automatically done with trigger
+      if not Supports_Slave_Mode (Handle.Instance)
+         or else not Is_Slave_Mode_Trigger_Enabled (Handle.Instance)
+      then
+         TIMx (Handle.Instance).CR1.CEN := 2#1#;
+      end if;
+
+      return OK;
+
+   end PWM_Start_DMA;
 
    ---------------------------------------------------------------------------
    procedure Set_Prescaler (Handle    : in out Handle_Type;

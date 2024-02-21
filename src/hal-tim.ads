@@ -182,6 +182,16 @@ package HAL.TIM is
       of Channel_State_Type;
    --
 
+   type DMA_Handle_Index_Type is
+      (UPDATE, CHANNEL_1, CHANNEL_2, CHANNEL_3, CHANNEL_4, TRIGGER)
+      with Default_Value => UPDATE;
+   --
+
+   type DMA_Handles_Type is
+      array (DMA_Handle_Index_Type)
+      of access HAL.DMA.Handle_Type;
+   --
+
    type Handle_Type;
    type Callback_Access_Type is
       access procedure (Handle : Handle_Type);
@@ -191,16 +201,18 @@ package HAL.TIM is
       record
          Instance : Instance_Type := Instance_Type'First;
          Init : Base_Init_Type;
-         Active_Channel : Active_Channel_Type := (Valid => False);
-         DMA_Handle : access HAL.DMA.Handle_Type;
          State : State_Type;
          Channels_State : Channels_State_Type;
-         Msp_Init : Callback_Access_Type;
-         IC_Capture : Callback_Access_Type;
-         OC_Delay_Elapsed : Callback_Access_Type;
-         Pulse_Finished : Callback_Access_Type;
-         Half_Pulse : Callback_Access_Type;
-         Error : Callback_Access_Type;
+         Active_Channel : Active_Channel_Type := (Valid => False);
+         --  DMA-related
+         DMA_Handles : DMA_Handles_Type;
+         --  Callbacks
+         MSP_Init_Callback : Callback_Access_Type;
+         IC_Capture_Callback : Callback_Access_Type;
+         OC_Delay_Elapsed_Callback : Callback_Access_Type;
+         Pulse_Finished_Callback : Callback_Access_Type;
+         Half_Pulse_Callback : Callback_Access_Type;
+         Error_Callback : Callback_Access_Type;
       end record;
    --  Timer (TIM) handle structure definition
    --
@@ -210,15 +222,15 @@ package HAL.TIM is
    --  @field Instance
    --  @field Init
    --  @field Active_Channel
-   --  @field DMA_Handle
    --  @field State
+   --  @field DMA_Handle
    --  @field Channels_State
-   --  @field Msp_Init
-   --  @field IC_Capture
-   --  @field OC_Delay_Elapsed
-   --  @field Pulse_Finished
-   --  @field Half_Pulse
-   --  @field Error
+   --  @field MSP_Init_Callback
+   --  @field IC_Capture_Callback
+   --  @field OC_Delay_Elapsed_Callback
+   --  @field Pulse_Finished_Callback
+   --  @field Half_Pulse_Callback
+   --  @field Error_Callback
 
    ---------------------------------------------------------------------------
    function PWM_Init (Handle : in out Handle_Type)
@@ -245,7 +257,7 @@ package HAL.TIM is
    function PWM_Start (Handle  : in out Handle_Type;
                        Channel : Channel_Type)
       return Status_Type;
-   --  Starts the PWM signal generation
+   --  Starts the Pulse Width Modulation (PWM) signal generation
    --
    --  The channel shall be in READY state
    --
@@ -261,7 +273,7 @@ package HAL.TIM is
    function PWM_Stop (Handle  : in out Handle_Type;
                       Channel : Channel_Type)
       return Status_Type;
-   --  Stop the PWM signal generation.
+   --  Stop the Pulse Width Modulation (PWM) signal generation.
    --
    --  TODO:
    --  - Add precondition contract IS_TIM_CCX_INSTANCE
@@ -270,6 +282,24 @@ package HAL.TIM is
    --  @param Handle Timer (TIM) handle
    --  @param Channel Timer (TIM) channels to be disabled
    --  @returns Operations success status
+
+   ---------------------------------------------------------------------------
+   function PWM_Start_DMA (Handle       : in out Handle_Type;
+                           Channel      : Channel_Type;
+                           Data_Address : HAL.DMA.Address_Type;
+                           Length       : HAL.DMA.Transfer_Length_Type)
+      return Status_Type;
+   --  Starts the Pulse Width Modulation (PWM) signal generation in Direct
+   --  Memory Access (DMA) mode.
+   --
+   --  TODO:
+   --  - Add precondition contract IS_TIM_CCX_INSTANCE
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Channel Timer (TIM) channels to be enabled
+   --  @param Data_Address The source Buffer address.
+   --  @param Length The length of data to be transferred from memory to TIM
+   --    peripheral
 
    ---------------------------------------------------------------------------
    procedure Set_Prescaler (Handle    : in out Handle_Type;
