@@ -202,6 +202,20 @@ package body HAL.TIM is
    end DMA_Error_Callback;
 
    ---------------------------------------------------------------------------
+   procedure Disable (Instance : Instance_Type) is
+   begin
+
+      if (TIMx (Instance).CCER.CC1E = 0)
+         and then (TIMx (Instance).CCER.CC2E = 0)
+         and then (TIMx (Instance).CCER.CC3E = 0)
+         and then (TIMx (Instance).CCER.CC4E = 0)
+      then
+         TIMx (Instance).CR1.CEN := 2#0#;
+      end if;
+
+   end Disable;
+
+   ---------------------------------------------------------------------------
    procedure Set_DMA_Request (Instance : Instance_Type;
                               Request  : DMA_Request_Type;
                               Enable   : Boolean) is
@@ -229,6 +243,12 @@ package body HAL.TIM is
    procedure Enable_DMA (Instance : Instance_Type;
                          Request  : DMA_Request_Type;
                          Enable   : Boolean := True)
+      renames Set_DMA_Request;
+
+   ---------------------------------------------------------------------------
+   procedure Disable_DMA (Instance : Instance_Type;
+                          Request  : DMA_Request_Type;
+                          Enable   : Boolean := False)
       renames Set_DMA_Request;
 
    -------------------------------------------------------------------------
@@ -327,7 +347,7 @@ package body HAL.TIM is
 
       --  Disable the Capture compare channel and the Peripheral
       CCx_Channel_Command (Handle.Instance, Channel, False);
-      TIMx (Handle.Instance).CR1.CEN := 2#0#;
+      Disable (Handle.Instance);
 
       Handle.Channels_State (Channel) := READY;
 
@@ -403,6 +423,37 @@ package body HAL.TIM is
       return OK;
 
    end PWM_Start_DMA;
+
+   ---------------------------------------------------------------------------
+   function PWM_Stop_DMA (Handle  : in out Handle_Type;
+                          Channel : Channel_Type)
+      return Status_Type is
+
+      DMA_Request : constant DMA_Request_Type := DMA_Request_Type'Val (
+            DMA_Request_Type'Pos (CAPTURE_COMPARE_1)
+            + Channel_Type'Pos (Channel) - Channel_Type'Pos (CHANNEL_1));
+
+      DMA_Handle : access HAL.DMA.Handle_Type
+         renames Handle.DMA_Handles (DMA_Request);
+
+      UNUSED_Status : Status_Type;
+
+   begin
+
+      --  Disable the TIM Capture/Compare DMA request
+      Disable_DMA (Handle.Instance, DMA_Request);
+      UNUSED_Status := HAL.DMA.Abort_IT (DMA_Handle.all);
+
+      --  Disable the Capture/Compare channel and the Peripheral
+      CCx_Channel_Command (Handle.Instance, Channel, False);
+      Disable (Handle.Instance);
+
+      --  Set the TIM channel state
+      Handle.Channels_State (Channel) := READY;
+
+      return OK;
+
+   end PWM_Stop_DMA;
 
    ---------------------------------------------------------------------------
    procedure Set_Prescaler (Handle    : in out Handle_Type;

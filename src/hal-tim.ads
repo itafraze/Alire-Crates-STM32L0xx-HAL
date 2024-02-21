@@ -301,6 +301,21 @@ package HAL.TIM is
    --  @param Data_Address The source Buffer address.
    --  @param Length The length of data to be transferred from memory to TIM
    --    peripheral
+   --  @returns Operations success status
+
+   ---------------------------------------------------------------------------
+   function PWM_Stop_DMA (Handle  : in out Handle_Type;
+                          Channel : Channel_Type)
+      return Status_Type;
+   --  Stop the Pulse Width Modulation (PWM) signal generation in Direct
+   --  Memory Access (DMA) mode.
+   --
+   --  TODO:
+   --  - Add precondition contract IS_TIM_CCX_INSTANCE
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Channel Timer (TIM) channels to be enabled
+   --  @returns Operations success status
 
    ---------------------------------------------------------------------------
    procedure Set_Prescaler (Handle    : in out Handle_Type;
