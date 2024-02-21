@@ -271,6 +271,23 @@ package HAL.TIM is
    --  @param Channel Timer (TIM) channels to be disabled
    --  @returns Operations success status
 
+   ---------------------------------------------------------------------------
+   procedure Set_Prescaler (Handle    : in out Handle_Type;
+                            Prescaler : Prescaler_Type);
+   --  Set the Timer (TIM) Prescaler on runtime.
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Prescaler Specifies the Prescaler new value.
+
+   ---------------------------------------------------------------------------
+   procedure Set_Autoreload (Handle     : in out Handle_Type;
+                             Autoreload : Period_Type);
+   --  Set the Timer TIM Autoreload Register value on runtime without calling
+   --  another time any Init function.
+   --
+   --  @param Handle Timer (TIM) handle
+   --  @param Autoreload Specifies the Counter register new value.
+
 private
 
    for Clock_Division_Type use (

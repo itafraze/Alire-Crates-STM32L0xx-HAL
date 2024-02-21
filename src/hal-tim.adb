@@ -278,4 +278,27 @@ package body HAL.TIM is
 
    end PWM_Stop;
 
+   ---------------------------------------------------------------------------
+   procedure Set_Prescaler (Handle    : in out Handle_Type;
+                            Prescaler : Prescaler_Type) is
+      --
+   begin
+
+      TIMx (Handle.Instance).PSC.PSC :=
+         PSC_PSC_Field (Natural (Prescaler) - 1);
+      Handle.Init.Prescaler := Prescaler;
+
+   end Set_Prescaler;
+
+   ---------------------------------------------------------------------------
+   procedure Set_Autoreload (Handle     : in out Handle_Type;
+                             Autoreload : Period_Type) is
+      --
+   begin
+
+      TIMx (Handle.Instance).ARR.ARR_L := ARR_ARR_L_Field (Autoreload);
+      Handle.Init.Period := Autoreload;
+
+   end Set_Autoreload;
+
 end HAL.TIM;
