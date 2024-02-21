@@ -177,6 +177,14 @@ package HAL.DMA is
                       Length      : Transfer_Length_Type)
       return Status_Type;
    --  Start the DMA Transfer with interrupt enabled
+   --
+   --  TODO:
+   --  - Add contract precondition IS_DMA_BUFFER_SIZE
+
+   ---------------------------------------------------------------------------
+   function Abort_IT (Handle : in out Handle_Type)
+      return Status_Type;
+   --  Aborts the DMA Transfer in Interrupt mode
 
 private
 

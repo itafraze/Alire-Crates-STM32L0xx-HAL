@@ -96,6 +96,12 @@ package body HAL.DMA is
       renames Set_Channel_IT;
 
    ---------------------------------------------------------------------------
+   procedure Disable_IT (Handle    : Handle_Type;
+                         Interrupt : Interrupt_Type;
+                         Enable    : Boolean := False)
+      renames Set_Channel_IT;
+
+   ---------------------------------------------------------------------------
    procedure Set_Config (Handle      : Handle_Type;
                          Source      : Address_Type;
                          Destination : Address_Type;
@@ -260,5 +266,45 @@ package body HAL.DMA is
       return OK;
 
    end Start_IT;
+
+   ---------------------------------------------------------------------------
+   function Abort_IT  (Handle : in out Handle_Type)
+      return Status_Type is
+   begin
+
+      if Handle.State /= BUSY
+      then
+         Handle.Error_Code := NO_TRANSFER;
+         return ERROR;
+      end if;
+
+      --  Disable DMA IT and channel
+      for Interrupt in Interrupt_Type'Range loop
+         Disable_IT (Handle, Interrupt);
+      end loop;
+      Disable (Handle);
+
+      --  Clear all flags
+      case All_Channel_Type (Handle.Channel) is
+         when CHANNEL_1 => DMAx (Handle.Instance).IFCR.CGIF1 := 2#1#;
+         when CHANNEL_2 => DMAx (Handle.Instance).IFCR.CGIF2 := 2#1#;
+         when CHANNEL_3 => DMAx (Handle.Instance).IFCR.CGIF3 := 2#1#;
+         when CHANNEL_4 => DMAx (Handle.Instance).IFCR.CGIF4 := 2#1#;
+         when CHANNEL_5 => DMAx (Handle.Instance).IFCR.CGIF5 := 2#1#;
+         when CHANNEL_6 => DMAx (Handle.Instance).IFCR.CGIF6 := 2#1#;
+         when CHANNEL_7 => DMAx (Handle.Instance).IFCR.CGIF7 := 2#1#;
+      end case;
+
+      --  Change the DMA state
+      Handle.State := READY;
+
+      if Handle.Transfer_Abort_Callback /= null
+      then
+         Handle.Transfer_Abort_Callback (Handle);
+      end if;
+
+      return OK;
+
+   end Abort_IT;
 
 end HAL.DMA;
