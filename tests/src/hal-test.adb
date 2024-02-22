@@ -43,8 +43,7 @@ is
    --  Count the execution of procedure MSP_Init
 
    -------------------------------------------------------------------------
-   overriding procedure Set_Up (UNUSED_T : in out Reset_Fixture)
-   is
+   overriding procedure Set_Up (UNUSED_T : in out Reset_Fixture) is
    begin
 
       MSP_Init_Calls := 0;
@@ -52,8 +51,7 @@ is
    end Set_Up;
 
    -------------------------------------------------------------------------
-   overriding procedure Set_Up (T : in out Init_Fixture)
-   is
+   overriding procedure Set_Up (T : in out Init_Fixture) is
       UNUSED_Status : Status_Type;
    begin
 
@@ -63,15 +61,14 @@ is
    end Set_Up;
 
    -------------------------------------------------------------------------
-   procedure MSP_Init
-   is
+   procedure MSP_Init is
    begin
       MSP_Init_Calls := @ + 1;
    end MSP_Init;
 
    -------------------------------------------------------------------------
-   procedure Init_Successful (UNUSED_T : in out Reset_Fixture)
-   is
+   procedure Init_Successful (UNUSED_T : in out Reset_Fixture);
+   procedure Init_Successful (UNUSED_T : in out Reset_Fixture) is
       --  HAL.Init returns no error
 
       Status : Status_Type;
@@ -86,9 +83,10 @@ is
    end Init_Successful;
 
    -------------------------------------------------------------------------
-   procedure Init_Calls_MSP_Init (UNUSED_T : in out Init_Fixture)
-   is
+   procedure Init_Calls_MSP_Init (UNUSED_T : in out Init_Fixture);
+   procedure Init_Calls_MSP_Init (UNUSED_T : in out Init_Fixture) is
       --  HAL.Init executes MSP_Init
+
    begin
 
       Assert (
@@ -100,8 +98,7 @@ is
 
    -------------------------------------------------------------------------
    function Suite
-      return AUnit.Test_Suites.Access_Test_Suite
-   is
+      return AUnit.Test_Suites.Access_Test_Suite is
    begin
 
       Result.Add_Test (
