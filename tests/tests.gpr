@@ -19,10 +19,24 @@ project Tests is
    package Builder is
       for Switches ("tests") use ("--create-map-file");
       for Executable_Suffix use ".elf";
+      for Global_Configuration_Pragmas use "tests.adc";
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use Tests_Config.Ada_Compiler_Switches;
+      Switches := Tests_Config.Ada_Compiler_Switches;
+      case Tests_Config.Build_Profile is
+         when "development" =>
+            Switches := Switches &
+               ("-gnatw_a", "-gnatwc", "-gnatVd", "-gnatVa", "-gnatr",
+               "-gnatyy", "-fgnat-encodings=gdb");
+         when "validation" =>
+            Switches := Switches &
+               ("-gnatw_a", "-gnatwc", "-gnatVd", "-gnatyy",
+               "-fno-strict-aliasing");
+         when "release" =>
+            Switches := Switches & ("-gnatyy", "-fno-strict-aliasing");
+      end case;
+      for Default_Switches ("Ada") use Switches;
    end Compiler;
 
    package Binder is
@@ -33,7 +47,8 @@ project Tests is
       for Switches ("Ada") use (
          "-T", "aunit.ld",
          "-T", Stm32l0xx_Cmsis.Linker.Default_Script,
-         "-Wl,--print-memory-usage");
+         "-Wl,--print-memory-usage",
+         "-Wl,--gc-sections");
    end Linker;
 
    type Emulation_Mode_Type is ("run", "debug");

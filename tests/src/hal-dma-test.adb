@@ -64,8 +64,8 @@ is
    end Set_Up;
 
    -------------------------------------------------------------------------
-   procedure Init_Success_With_Defaults (UNUSED_T : in out Reset_Fixture)
-   is
+   procedure Init_Success_With_Defaults (UNUSED_T : in out Reset_Fixture);
+   procedure Init_Success_With_Defaults (UNUSED_T : in out Reset_Fixture) is
       --  HAL.DMA.Init returns no errors with default handle
 
       Status : Status_Type;
@@ -94,8 +94,9 @@ is
 
    -------------------------------------------------------------------------
    procedure CCR1_Value_After_Default_Init (
-      UNUSED_T : in out Init_Defaults_Fixture)
-   is
+      UNUSED_T : in out Init_Defaults_Fixture);
+   procedure CCR1_Value_After_Default_Init (
+      UNUSED_T : in out Init_Defaults_Fixture) is
       --  Check value of CCR1 register after initialisation with default
       --  handle
 
