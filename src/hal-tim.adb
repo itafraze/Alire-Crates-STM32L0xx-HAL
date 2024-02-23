@@ -37,6 +37,9 @@ package body HAL.TIM is
 
    -------------------------------------------------------------------------
    procedure Base_Set_Config (Instance  : Instance_Type;
+                              Base_Init : Base_Init_Type);
+
+   procedure Base_Set_Config (Instance  : Instance_Type;
                               Base_Init : Base_Init_Type) is
    begin
 
@@ -77,6 +80,9 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC1_Set_Config (Instance : Instance_Type;
+                             Config   : PWM_Init_Type);
+
+   procedure OC1_Set_Config (Instance : Instance_Type;
                              Config   : PWM_Init_Type) is
    begin
 
@@ -93,6 +99,9 @@ package body HAL.TIM is
    end OC1_Set_Config;
 
    ---------------------------------------------------------------------------
+   procedure OC2_Set_Config (Instance : Instance_Type;
+                             Config   : PWM_Init_Type);
+
    procedure OC2_Set_Config (Instance : Instance_Type;
                              Config   : PWM_Init_Type) is
    begin
@@ -111,6 +120,9 @@ package body HAL.TIM is
 
    ---------------------------------------------------------------------------
    procedure OC3_Set_Config (Instance : Instance_Type;
+                             Config   : PWM_Init_Type);
+
+   procedure OC3_Set_Config (Instance : Instance_Type;
                              Config   : PWM_Init_Type) is
    begin
 
@@ -127,6 +139,9 @@ package body HAL.TIM is
    end OC3_Set_Config;
 
    ---------------------------------------------------------------------------
+   procedure OC4_Set_Config (Instance : Instance_Type;
+                             Config   : PWM_Init_Type);
+
    procedure OC4_Set_Config (Instance : Instance_Type;
                              Config   : PWM_Init_Type) is
    begin
@@ -146,8 +161,12 @@ package body HAL.TIM is
    ---------------------------------------------------------------------------
    procedure CCx_Channel_Command (Instance : Instance_Type;
                                   Channel  : Channel_Type;
+                                  Enable   : Boolean);
+   --  Enables or disables the Timer (TIM) Capture Compare channel
+
+   procedure CCx_Channel_Command (Instance : Instance_Type;
+                                  Channel  : Channel_Type;
                                   Enable   : Boolean) is
-      --  Enables or disables the Timer (TIM) Capture Compare channel
    begin
 
       --  Reset the CCxE bit before applying the configuration
@@ -175,33 +194,39 @@ package body HAL.TIM is
       with Inline;
 
    ---------------------------------------------------------------------------
+   procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type);
+   --  DMA Delay Pulse complete callback
+   --
+   --  @param Handle Direct Memory Access (DMA) handle
+
    procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type) is
-      --  DMA Delay Pulse complete callback
-      --
-      --  @param Handle Direct Memory Access (DMA) handle
    begin
       null;
    end DMA_Delay_Pulse_Callback;
 
    ---------------------------------------------------------------------------
+   procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type);
+   --  DMA Delay Pulse half complete callback
+   --
+   --  @param Handle Direct Memory Access (DMA) handle
    procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type) is
-      --  DMA Delay Pulse half complete callback
-      --
-      --  @param Handle Direct Memory Access (DMA) handle
    begin
       null;
    end DMA_Delay_Pulse_Half_Callback;
 
    ---------------------------------------------------------------------------
+   procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type);
+   --  DMA Delay Pulse half complete callback
+   --
+   --  @param Handle Direct Memory Access (DMA) handle
    procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type) is
-      --  DMA Delay Pulse half complete callback
-      --
-      --  @param Handle Direct Memory Access (DMA) handle
    begin
       null;
    end DMA_Error_Callback;
 
    ---------------------------------------------------------------------------
+   procedure Enable (Instance : Instance_Type);
+
    procedure Enable (Instance : Instance_Type) is
    begin
 
@@ -210,6 +235,8 @@ package body HAL.TIM is
    end Enable;
 
    ---------------------------------------------------------------------------
+   procedure Disable (Instance : Instance_Type);
+
    procedure Disable (Instance : Instance_Type) is
    begin
 
@@ -226,8 +253,12 @@ package body HAL.TIM is
    ---------------------------------------------------------------------------
    procedure Set_DMA_Request (Instance : Instance_Type;
                               Request  : DMA_Request_Type;
+                              Enable   : Boolean);
+   --  Enable or disable the specified DMA request.
+
+   procedure Set_DMA_Request (Instance : Instance_Type;
+                              Request  : DMA_Request_Type;
                               Enable   : Boolean) is
-      --  Enable or disable the specified DMA request.
    begin
 
       case Request is

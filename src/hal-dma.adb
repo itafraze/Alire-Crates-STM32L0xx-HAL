@@ -36,8 +36,11 @@ package body HAL.DMA is
 
    ---------------------------------------------------------------------------
    procedure Set_Channel (Handle : Handle_Type;
+                          Enable : Boolean);
+   --  Enable or disable the specified DMA Channel
+
+   procedure Set_Channel (Handle : Handle_Type;
                           Enable : Boolean) is
-      --  Enable or disable the specified DMA Channel
 
       CCRx : constant not null access CCR_Register := (
          case All_Channel_Type (Handle.Channel) is
@@ -67,8 +70,12 @@ package body HAL.DMA is
    ---------------------------------------------------------------------------
    procedure Set_Channel_IT (Handle    : Handle_Type;
                              Interrupt : Interrupt_Type;
+                             Enable    : Boolean);
+   --  Enable the specified DMA Channel interrupts
+
+   procedure Set_Channel_IT (Handle    : Handle_Type;
+                             Interrupt : Interrupt_Type;
                              Enable    : Boolean) is
-      --  Enable the specified DMA Channel interrupts
 
       CCRx : constant not null access CCR_Register := (
          case All_Channel_Type (Handle.Channel) is
@@ -105,8 +112,14 @@ package body HAL.DMA is
    procedure Set_Config (Handle      : Handle_Type;
                          Source      : Address_Type;
                          Destination : Address_Type;
+                         Length      : Transfer_Length_Type);
+   --  Sets the DMA Transfer parameter
+
+   procedure Set_Config (Handle      : Handle_Type;
+                         Source      : Address_Type;
+                         Destination : Address_Type;
                          Length      : Transfer_Length_Type) is
-      --  Sets the DMA Transfer parameter
+
       use CMSIS.Device;
 
       Peripheral_Address : constant UInt32 := UInt32 (
