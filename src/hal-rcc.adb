@@ -41,25 +41,25 @@ package body HAL.RCC is
 
    ---------------------------------------------------------------------------
    function Get_System_Clock_Source
-      return System_Clock_Source_Type
-   is
+      return System_Clock_Source_Type is
       (System_Clock_Source_Type'Val (RCC.RCC_Periph.CFGR.SWS))
-   with Inline;
+      with Inline;
 
    ---------------------------------------------------------------------------
    function Get_PLL_Osc_Source
-      return PLL_Clock_Source_Type
-   is
+      return PLL_Clock_Source_Type is
       (PLL_Clock_Source_Type'Val (RCC.RCC_Periph.CFGR.PLLSRC))
-   with Inline;
+      with Inline;
 
    ---------------------------------------------------------------------------
    function HSI_Config (State       : HSI_Config_Type;
                         Calibration : HSI_Calibration_Type)
-      return Status_Type
-   is
+      return Status_Type;
    --  High-Speed Internal (HSI) oscillator configuration
-   --
+
+   function HSI_Config (State       : HSI_Config_Type;
+                        Calibration : HSI_Calibration_Type)
+      return Status_Type is
    --  Implementation notes:
    --  - Based on HSI code section from function HAL_RCC_OscConfig
    --
@@ -155,10 +155,13 @@ package body HAL.RCC is
    function MSI_Config (State       : MSI_Config_Type;
                         Calibration : MSI_Calibration_Type;
                         Clock_Range : MSI_Clock_Range_Type)
-      return Status_Type
-   is
+      return Status_Type;
    --  Multi-Speed Internal (MSI) oscillator configuration
-   --
+
+   function MSI_Config (State       : MSI_Config_Type;
+                        Calibration : MSI_Calibration_Type;
+                        Clock_Range : MSI_Clock_Range_Type)
+      return Status_Type is
    --  Implementation notes:
    --  - Based on MSI code section from function HAL_RCC_OscConfig
    --
@@ -229,8 +232,8 @@ package body HAL.RCC is
 
    ---------------------------------------------------------------------------
    function Oscillators_Config (Init : Oscillators_Init_Type)
-      return Status_Type
-   is
+      return Status_Type is
+
       Success : Status_Type := ERROR;
    begin
 
@@ -272,10 +275,10 @@ package body HAL.RCC is
    ---------------------------------------------------------------------------
    function Clocks_Config (Init          : Clocks_Init_Type;
                            Flash_Latency : Latency_Type)
-      return Status_Type
-   is
+      return Status_Type is
    --  TODO:
    --  - Add timeout in ready waits
+
    begin
 
       --  Increasing the number of wait states because of higher CPU frequency
@@ -379,8 +382,7 @@ package body HAL.RCC is
 
    ---------------------------------------------------------------------------
    function Get_System_Clock_Frequency
-      return Natural
-   is
+      return Natural is
    --  TODO:
    --  - Implement HSE and PLLCLK
 
