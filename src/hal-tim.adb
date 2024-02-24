@@ -21,6 +21,8 @@
 --
 ------------------------------------------------------------------------------
 
+with System.Address_To_Access_Conversions;
+
 with CMSIS.Device;
    use CMSIS.Device;
 with CMSIS.Device.TIM;
@@ -200,8 +202,45 @@ package body HAL.TIM is
    --  @param Handle Direct Memory Access (DMA) handle
 
    procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type) is
+
+      package Handles_Conversions is new
+         System.Address_To_Access_Conversions (Handle_Type);
+      use Handles_Conversions;
+
+      use all type HAL.DMA.Mode_Type;
+
+      TIM_Handle : constant access Handle_Type := To_Pointer (Handle.Parent);
+
+      CCxDE_Values : constant array (Channel_Type)
+         of Boolean := [
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC1DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC2DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC3DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC4DE)];
    begin
-      null;
+
+      for Channel in Channel_Type
+      loop
+         if CCxDE_Values (Channel)
+         then
+            TIM_Handle.Active_Channel := (Valid   => True,
+                                          Channel => Channel);
+            if Handle.Init.Mode = NORMAL
+            then
+               TIM_Handle.Channels_State (Channel) := READY;
+            end if;
+
+            exit;
+         end if;
+      end loop;
+
+      if TIM_Handle.Pulse_Finished_Callback /= null
+      then
+         TIM_Handle.Pulse_Finished_Callback (TIM_Handle.all);
+      end if;
+
+      TIM_Handle.Active_Channel := (Valid => False);
+
    end DMA_Delay_Pulse_Callback;
 
    ---------------------------------------------------------------------------
@@ -209,9 +248,41 @@ package body HAL.TIM is
    --  DMA Delay Pulse half complete callback
    --
    --  @param Handle Direct Memory Access (DMA) handle
+
    procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type) is
+
+      package Handles_Conversions is new
+         System.Address_To_Access_Conversions (Handle_Type);
+      use Handles_Conversions;
+
+      TIM_Handle : constant access Handle_Type := To_Pointer (Handle.Parent);
+
+      CCxDE_Values : constant array (Channel_Type)
+         of Boolean := [
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC1DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC2DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC3DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC4DE)];
+
    begin
-      null;
+
+      for Channel in Channel_Type
+      loop
+         if CCxDE_Values (Channel)
+         then
+            TIM_Handle.Active_Channel := (Valid   => True,
+                                          Channel => Channel);
+            exit;
+         end if;
+      end loop;
+
+      if TIM_Handle.Half_Pulse_Callback /= null
+      then
+         TIM_Handle.Half_Pulse_Callback (TIM_Handle.all);
+      end if;
+
+      TIM_Handle.Active_Channel := (Valid => False);
+
    end DMA_Delay_Pulse_Half_Callback;
 
    ---------------------------------------------------------------------------
@@ -219,9 +290,53 @@ package body HAL.TIM is
    --  DMA Delay Pulse half complete callback
    --
    --  @param Handle Direct Memory Access (DMA) handle
+
    procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type) is
+
+      package Handles_Conversions is new
+         System.Address_To_Access_Conversions (Handle_Type);
+      use Handles_Conversions;
+
+      use all type HAL.DMA.Mode_Type;
+
+      TIM_Handle : constant access Handle_Type := To_Pointer (Handle.Parent);
+
+      CCxDE_Values : constant array (Channel_Type)
+         of Boolean := [
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC1DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC2DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC3DE),
+            Boolean'Val (TIMx (TIM_Handle.Instance).DIER.CC4DE)];
    begin
-      null;
+
+      TIM_Handle.Active_Channel := (Valid => False);
+
+      for Channel in Channel_Type
+      loop
+         if CCxDE_Values (Channel)
+         then
+            TIM_Handle.Active_Channel := (Valid   => True,
+                                          Channel => Channel);
+            if Handle.Init.Mode = NORMAL
+            then
+               TIM_Handle.Channels_State (Channel) := READY;
+            end if;
+            exit;
+         end if;
+      end loop;
+
+      if not TIM_Handle.Active_Channel.Valid
+      then
+         TIM_Handle.State := READY;
+      end if;
+
+      if TIM_Handle.Error_Callback /= null
+      then
+         TIM_Handle.Error_Callback (TIM_Handle.all);
+      end if;
+
+      TIM_Handle.Active_Channel := (Valid => False);
+
    end DMA_Error_Callback;
 
    ---------------------------------------------------------------------------
