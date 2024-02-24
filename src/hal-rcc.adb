@@ -456,6 +456,16 @@ package body HAL.RCC is
    end Get_PCLK2_Frequency;
 
    ---------------------------------------------------------------------------
+   --  DMA_Clock_Enable
+   --
+   procedure DMA_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.AHBENR.DMAEN := 2#1#;
+   end DMA_Clock_Enable;
+
+   ---------------------------------------------------------------------------
    procedure TIM2_Clock_Enable is
       --
       use CMSIS.Device.RCC;
