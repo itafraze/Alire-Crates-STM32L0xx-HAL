@@ -201,6 +201,15 @@ package body HAL.DMA is
          Request_Type'Pos (Handle.Init.Request);
    begin
 
+      if Handle.State = RESET then
+
+         if Handle.MSP_Init_Callback /= null
+         then
+            Handle.MSP_Init_Callback (Handle);
+         end if;
+
+      end if;
+
       --  Change DMA peripheral state
       Handle.State := BUSY;
 
