@@ -195,7 +195,7 @@ package HAL.TIM is
 
    type Handle_Type;
    type Callback_Access_Type is
-      access procedure (Handle : Handle_Type);
+      access procedure (Handle : in out Handle_Type);
    --
 
    type Handle_Type is

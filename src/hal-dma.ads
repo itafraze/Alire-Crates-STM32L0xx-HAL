@@ -113,7 +113,7 @@ package HAL.DMA is
 
    type Handle_Type;
    type Callback_Access_Type
-      is access procedure (Handle : Handle_Type);
+      is access procedure (Handle : in out Handle_Type);
    --
 
    type Error_Code_Type is
