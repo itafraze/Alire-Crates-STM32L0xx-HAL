@@ -196,12 +196,12 @@ package body HAL.TIM is
       with Inline;
 
    ---------------------------------------------------------------------------
-   procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type);
+   procedure DMA_Delay_Pulse_Callback (Handle : in out HAL.DMA.Handle_Type);
    --  DMA Delay Pulse complete callback
    --
    --  @param Handle Direct Memory Access (DMA) handle
 
-   procedure DMA_Delay_Pulse_Callback (Handle : HAL.DMA.Handle_Type) is
+   procedure DMA_Delay_Pulse_Callback (Handle : in out HAL.DMA.Handle_Type) is
 
       package Handles_Conversions is new
          System.Address_To_Access_Conversions (Handle_Type);
@@ -244,12 +244,14 @@ package body HAL.TIM is
    end DMA_Delay_Pulse_Callback;
 
    ---------------------------------------------------------------------------
-   procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type);
+   procedure DMA_Delay_Pulse_Half_Callback (
+      Handle : in out HAL.DMA.Handle_Type);
    --  DMA Delay Pulse half complete callback
    --
    --  @param Handle Direct Memory Access (DMA) handle
 
-   procedure DMA_Delay_Pulse_Half_Callback (Handle : HAL.DMA.Handle_Type) is
+   procedure DMA_Delay_Pulse_Half_Callback (
+      Handle : in out HAL.DMA.Handle_Type) is
 
       package Handles_Conversions is new
          System.Address_To_Access_Conversions (Handle_Type);
@@ -286,12 +288,12 @@ package body HAL.TIM is
    end DMA_Delay_Pulse_Half_Callback;
 
    ---------------------------------------------------------------------------
-   procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type);
+   procedure DMA_Error_Callback (Handle : in out HAL.DMA.Handle_Type);
    --  DMA Delay Pulse half complete callback
    --
    --  @param Handle Direct Memory Access (DMA) handle
 
-   procedure DMA_Error_Callback (Handle : HAL.DMA.Handle_Type) is
+   procedure DMA_Error_Callback (Handle : in out HAL.DMA.Handle_Type) is
 
       package Handles_Conversions is new
          System.Address_To_Access_Conversions (Handle_Type);
