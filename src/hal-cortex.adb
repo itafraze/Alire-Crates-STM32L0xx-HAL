@@ -31,22 +31,31 @@ package body HAL.Cortex is
    --------------------------------------------------------------------------
    procedure NVIC_Set_Priority (IRQ              : Interrupt_Type;
                                 Preempt_Priority : Priority_Type;
-                                Sub_Priority     : Priority_Type)
-   is
+                                Sub_Priority     : Priority_Type) is
       pragma Unreferenced (Sub_Priority);
    begin
 
       CMSIS.Core.NVIC.Set_Priority (IRQ, Preempt_Priority);
 
    end NVIC_Set_Priority;
+
+   --------------------------------------------------------------------------
    procedure NVIC_Set_Priority (IRQ              : Exception_Type;
                                 Preempt_Priority : Priority_Type;
-                                Sub_Priority     : Priority_Type)
-   is
+                                Sub_Priority     : Priority_Type) is
       pragma Unreferenced (Sub_Priority);
    begin
 
       CMSIS.Core.NVIC.Set_Priority (IRQ, Preempt_Priority);
 
    end NVIC_Set_Priority;
+
+   --------------------------------------------------------------------------
+   procedure NVIC_Enable_IRQ (IRQ : Interrupt_Type) is
+   begin
+
+      CMSIS.Core.NVIC.Enable_IRQ (IRQ);
+
+   end NVIC_Enable_IRQ;
+
 end HAL.Cortex;

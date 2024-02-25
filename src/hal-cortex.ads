@@ -69,4 +69,7 @@ package HAL.Cortex is
    --  @param Sub_Priority This parameter is a dummy value for stm32l0xx
    --    devices
 
+   --------------------------------------------------------------------------
+   procedure NVIC_Enable_IRQ (IRQ : Interrupt_Type);
+
 end HAL.Cortex;
