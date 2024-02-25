@@ -320,4 +320,149 @@ package body HAL.DMA is
 
    end Abort_IT;
 
+   ---------------------------------------------------------------------------
+   procedure IRQ_Handler (Handle : in out Handle_Type) is
+
+      use CMSIS.Device;
+
+      type Flags_Type is
+         record
+            ISR_HTx : Boolean;
+            ISR_TCx : Boolean;
+            ISR_TEx : Boolean;
+            CCRx    : access CCR_Register;
+         end record;
+
+      Flags : constant Flags_Type := (
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF1),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF1),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF1),
+               CCRx    => DMAx (Handle.Instance).CCR1'Access),
+            when CHANNEL_2 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF2),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF2),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF2),
+               CCRx    => DMAx (Handle.Instance).CCR2'Access),
+            when CHANNEL_3 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF3),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF3),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF3),
+               CCRx    => DMAx (Handle.Instance).CCR3'Access),
+            when CHANNEL_4 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF4),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF4),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF4),
+               CCRx    => DMAx (Handle.Instance).CCR4'Access),
+            when CHANNEL_5 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF5),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF5),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF5),
+               CCRx    => DMAx (Handle.Instance).CCR5'Access),
+            when CHANNEL_6 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF6),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF6),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF6),
+               CCRx    => DMAx (Handle.Instance).CCR6'Access),
+            when CHANNEL_7 => (
+               ISR_HTx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.HTIF7),
+               ISR_TCx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TCIF7),
+               ISR_TEx => Boolean'Enum_Val (DMAx (Handle.Instance).ISR.TEIF7),
+               CCRx    => DMAx (Handle.Instance).CCR7'Access));
+
+      Is_Half_Transfer : constant Boolean :=
+         Flags.ISR_HTx and then (Flags.CCRx.HTIE /= 2#0#);
+      Is_Transfer_Complete : constant Boolean :=
+         Flags.ISR_TCx and then (Flags.CCRx.TCIE /= 2#0#);
+      Is_Transfer_Error : constant Boolean :=
+         Flags.ISR_TEx and then (Flags.CCRx.TEIE /= 2#0#);
+
+   begin
+
+      --  Half Transfer Complete Interrupt management
+      if Is_Half_Transfer
+      then
+         --  Disable the half transfer interrupt if the DMA mode is not
+         --  CIRCULAR
+         if Handle.Init.Mode /= CIRCULAR
+         then
+            Disable_IT (Handle, HALF_TRANSFER);
+         end if;
+
+         --  Clear the half transfer complete flag
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).IFCR.CHTIF1 := 2#1#;
+            when CHANNEL_2 => DMAx (Handle.Instance).IFCR.CHTIF2 := 2#1#;
+            when CHANNEL_3 => DMAx (Handle.Instance).IFCR.CHTIF3 := 2#1#;
+            when CHANNEL_4 => DMAx (Handle.Instance).IFCR.CHTIF4 := 2#1#;
+            when CHANNEL_5 => DMAx (Handle.Instance).IFCR.CHTIF5 := 2#1#;
+            when CHANNEL_6 => DMAx (Handle.Instance).IFCR.CHTIF6 := 2#1#;
+            when CHANNEL_7 => DMAx (Handle.Instance).IFCR.CHTIF7 := 2#1#;
+         end case;
+
+         if Handle.Transfer_Half_Complete_Callback /= null
+         then
+            Handle.Transfer_Half_Complete_Callback (Handle);
+         end if;
+
+      elsif Is_Transfer_Complete
+      then
+         --  Disable the transfer and error interrupts if the DMA mode is not
+         --  CIRCULAR
+         if Handle.Init.Mode /= CIRCULAR
+         then
+            Disable_IT (Handle, TRANSFER_COMPLETE);
+            Disable_IT (Handle, TRANSFER_ERROR);
+            --  Change the DMA state
+            Handle.State := READY;
+         end if;
+
+         --  Clear the transfer complete flag
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).IFCR.CTCIF1 := 2#1#;
+            when CHANNEL_2 => DMAx (Handle.Instance).IFCR.CTCIF2 := 2#1#;
+            when CHANNEL_3 => DMAx (Handle.Instance).IFCR.CTCIF3 := 2#1#;
+            when CHANNEL_4 => DMAx (Handle.Instance).IFCR.CTCIF4 := 2#1#;
+            when CHANNEL_5 => DMAx (Handle.Instance).IFCR.CTCIF5 := 2#1#;
+            when CHANNEL_6 => DMAx (Handle.Instance).IFCR.CTCIF6 := 2#1#;
+            when CHANNEL_7 => DMAx (Handle.Instance).IFCR.CTCIF7 := 2#1#;
+         end case;
+
+         if Handle.Transfer_Complete_Callback /= null
+         then
+            Handle.Transfer_Complete_Callback (Handle);
+         end if;
+
+      elsif Is_Transfer_Error
+      then
+         --  Disable interrupts
+         Disable_IT (Handle, TRANSFER_COMPLETE);
+         Disable_IT (Handle, HALF_TRANSFER);
+         Disable_IT (Handle, TRANSFER_ERROR);
+
+         --  Clear all flags
+         case All_Channel_Type (Handle.Channel) is
+            when CHANNEL_1 => DMAx (Handle.Instance).IFCR.CGIF1 := 2#1#;
+            when CHANNEL_2 => DMAx (Handle.Instance).IFCR.CGIF2 := 2#1#;
+            when CHANNEL_3 => DMAx (Handle.Instance).IFCR.CGIF3 := 2#1#;
+            when CHANNEL_4 => DMAx (Handle.Instance).IFCR.CGIF4 := 2#1#;
+            when CHANNEL_5 => DMAx (Handle.Instance).IFCR.CGIF5 := 2#1#;
+            when CHANNEL_6 => DMAx (Handle.Instance).IFCR.CGIF6 := 2#1#;
+            when CHANNEL_7 => DMAx (Handle.Instance).IFCR.CGIF7 := 2#1#;
+         end case;
+
+         --  Update error code and dhange the DMA state
+         Handle.Error_Code := TE;
+         Handle.State := READY;
+
+         if Handle.Transfer_Error_Callback /= null
+         then
+            Handle.Transfer_Error_Callback (Handle);
+         end if;
+
+      end if;
+
+   end IRQ_Handler;
+
 end HAL.DMA;

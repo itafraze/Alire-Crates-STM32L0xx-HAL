@@ -145,12 +145,13 @@ package HAL.DMA is
    --  @field Channel  Direct Memory Access (DMA) channel reference
    --  @field Init Communication parameters
    --  @field State Transfer state
-   --  @field Parent Parent object state
-   --  @field Transfer_Complete Transfer complete callback
-   --  @field Transfer_Half_Complete Half transfer complete callback
-   --  @field Transfer_Error Transfer error callback
-   --  @field Transfer_Abort Transfer abort callback
    --  @field Error code
+   --  @field Parent Parent object state
+   --  @field MSP_Init_Callback
+   --  @field Transfer_Complete_Callback Transfer complete callback
+   --  @field Transfer_Half_Complete_Callback Half transfer complete callback
+   --  @field Transfer_Error_Callback Transfer error callback
+   --  @field Transfer_Abort_Callback Transfer abort callback
 
    subtype Address_Type is
       System.Address;
@@ -185,6 +186,9 @@ package HAL.DMA is
    function Abort_IT (Handle : in out Handle_Type)
       return Status_Type;
    --  Aborts the DMA Transfer in Interrupt mode
+
+   ---------------------------------------------------------------------------
+   procedure IRQ_Handler (Handle : in out Handle_Type);
 
 private
 
