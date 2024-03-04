@@ -410,4 +410,107 @@ package body HAL.RCC is
 
    end Get_System_Clock_Frequency;
 
+   ---------------------------------------------------------------------------
+   function Get_HCLK_Frequency
+      return Natural is
+      (CMSIS.Device.System.Core_Clock);
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK1_Frequency
+      return Natural is
+      --
+      use CMSIS.Device.RCC;
+
+      Prescaler : constant Natural :=
+         Natural (RCC_Periph.CFGR.PPRE.Arr (1));
+      Frequency : Natural := Get_HCLK_Frequency;
+   begin
+
+      if Prescaler >= 2#100#
+      then
+         Frequency := @ / (2 ** (Prescaler - 2#011#));
+      end if;
+
+      return Frequency;
+
+   end Get_PCLK1_Frequency;
+
+   ---------------------------------------------------------------------------
+   function Get_PCLK2_Frequency
+      return Natural is
+      --
+      use CMSIS.Device.RCC;
+
+      Prescaler : constant Natural :=
+         Natural (RCC_Periph.CFGR.PPRE.Arr (2));
+      Frequency : Natural := Get_HCLK_Frequency;
+   begin
+
+      if Prescaler >= 2#100#
+      then
+         Frequency := @ / (2 ** (Prescaler - 2#011#));
+      end if;
+
+      return Frequency;
+
+   end Get_PCLK2_Frequency;
+
+   ---------------------------------------------------------------------------
+   --  DMA_Clock_Enable
+   --
+   procedure DMA_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.AHBENR.DMAEN := 2#1#;
+   end DMA_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM2_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM2EN := 2#1#;
+   end TIM2_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM3_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM3EN := 2#1#;
+   end TIM3_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM21_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB2ENR.TIM21EN := 2#1#;
+   end TIM21_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM22_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB2ENR.TIM22EN := 2#1#;
+   end TIM22_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM6_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM6EN := 2#1#;
+   end TIM6_Clock_Enable;
+
+   ---------------------------------------------------------------------------
+   procedure TIM7_Clock_Enable is
+      --
+      use CMSIS.Device.RCC;
+   begin
+      RCC_Periph.APB1ENR.TIM7EN := 2#1#;
+   end TIM7_Clock_Enable;
+
 end HAL.RCC;

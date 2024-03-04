@@ -113,7 +113,7 @@ package HAL.DMA is
 
    type Handle_Type;
    type Callback_Access_Type
-      is access procedure (Handle : Handle_Type);
+      is access procedure (Handle : in out Handle_Type);
    --
 
    type Error_Code_Type is
@@ -127,12 +127,14 @@ package HAL.DMA is
          Channel : Channel_Type := Channel_Type'First;
          Init : Init_Type;
          State : State_Type;
-         Parent : System.Address := System.Null_Address;
-         Transfer_Complete : Callback_Access_Type;
-         Transfer_Half_Complete : Callback_Access_Type;
-         Transfer_Error : Callback_Access_Type;
-         Transfer_Abort : Callback_Access_Type;
          Error_Code : Error_Code_Type;
+         Parent : System.Address := System.Null_Address;
+         --  Callbacks-related
+         MSP_Init_Callback : Callback_Access_Type;
+         Transfer_Complete_Callback : Callback_Access_Type;
+         Transfer_Half_Complete_Callback : Callback_Access_Type;
+         Transfer_Error_Callback : Callback_Access_Type;
+         Transfer_Abort_Callback : Callback_Access_Type;
       end record;
    --  Direct Memory Access (DMA) handle structure definition
    --
@@ -143,12 +145,21 @@ package HAL.DMA is
    --  @field Channel  Direct Memory Access (DMA) channel reference
    --  @field Init Communication parameters
    --  @field State Transfer state
-   --  @field Parent Parent object state
-   --  @field Transfer_Complete Transfer complete callback
-   --  @field Transfer_Half_Complete Half transfer complete callback
-   --  @field Transfer_Error Transfer error callback
-   --  @field Transfer_Abort Transfer abort callback
    --  @field Error code
+   --  @field Parent Parent object state
+   --  @field MSP_Init_Callback
+   --  @field Transfer_Complete_Callback Transfer complete callback
+   --  @field Transfer_Half_Complete_Callback Half transfer complete callback
+   --  @field Transfer_Error_Callback Transfer error callback
+   --  @field Transfer_Abort_Callback Transfer abort callback
+
+   subtype Address_Type is
+      System.Address;
+   --  Type of memory address
+
+   subtype Transfer_Length_Type is
+      Positive range 1 .. 2**15;
+   --
 
    ---------------------------------------------------------------------------
    function Init (Handle : in out Handle_Type)
@@ -159,6 +170,25 @@ package HAL.DMA is
    --
    --  @param Handle Configuration information for the specified DMA Channel
    --  @return Status of operations.
+
+   ---------------------------------------------------------------------------
+   function Start_IT (Handle      : in out Handle_Type;
+                      Source      : Address_Type;
+                      Destination : Address_Type;
+                      Length      : Transfer_Length_Type)
+      return Status_Type;
+   --  Start the DMA Transfer with interrupt enabled
+   --
+   --  TODO:
+   --  - Add contract precondition IS_DMA_BUFFER_SIZE
+
+   ---------------------------------------------------------------------------
+   function Abort_IT (Handle : in out Handle_Type)
+      return Status_Type;
+   --  Aborts the DMA Transfer in Interrupt mode
+
+   ---------------------------------------------------------------------------
+   procedure IRQ_Handler (Handle : in out Handle_Type);
 
 private
 
